@@ -16,9 +16,9 @@ import net.minecraft.world.phys.AABB;
 import java.util.List;
 
 //#if MC > 12001
-import net.minecraft.core.dispenser.BlockSource;
+//$$ import net.minecraft.core.dispenser.BlockSource;
 //#else
-//$$ import net.minecraft.core.BlockSource;
+import net.minecraft.core.BlockSource;
 //#endif
 
 public class GlassBottleDispenserBehavior extends MyFallibleItemDispenserBehavior {
@@ -37,7 +37,7 @@ public class GlassBottleDispenserBehavior extends MyFallibleItemDispenserBehavio
         oldItem.shrink(1);
         if (oldItem.isEmpty())
             return newItem.copy();
-        if (((DispenserBlockEntity) pointer.blockEntity()).addItem(newItem.copy()) < 0)
+        if (((DispenserBlockEntity) pointer.getEntity()).addItem(newItem.copy()) < 0)
             this.fallbackBehavior.dispense(pointer, newItem.copy());
         return oldItem;
     }
@@ -47,28 +47,28 @@ public class GlassBottleDispenserBehavior extends MyFallibleItemDispenserBehavio
         if (!PluslsCarpetAdditionSettings.dispenserCollectXp) {
             return itemStack;
         }
-        BlockPos faceBlockPos = pointer.pos().relative(pointer.state().getValue(DispenserBlock.FACING));
+        BlockPos faceBlockPos = pointer.getPos().relative(pointer.getBlockState().getValue(DispenserBlock.FACING));
 
-        List<ExperienceOrb> xpEntityList = pointer.level().getEntitiesOfClass(ExperienceOrb.class,
+        List<ExperienceOrb> xpEntityList = pointer.getLevel().getEntitiesOfClass(ExperienceOrb.class,
                 new AABB(faceBlockPos), Entity::isAlive);
 
         int currentXp = 0;
         // 运算次数不多，所以多循环几次也无所谓（放弃思考.jpg
         for (ExperienceOrb xpEntity : xpEntityList) {
             //#if MC > 11605
-            for (; xpEntity.count > 0; --xpEntity.count) {
+            //$$ for (; xpEntity.count > 0; --xpEntity.count) {
             //#else
-            //$$ for (; xpEntity.value > 0; --xpEntity.value) {
+            for (; xpEntity.value > 0; --xpEntity.value) {
             //#endif
                 currentXp += xpEntity.getValue();
                 // 有残留经验也无所谓，直接把经验球销毁
                 // 付出点代价很合理
                 //#if MC > 11605
-                if (xpEntity.count == 1) {
-                    xpEntity.discard();
+                //$$ if (xpEntity.count == 1) {
+                //$$     xpEntity.discard();
                 //#else
-                //$$ if (xpEntity.value == 1) {
-                //$$     xpEntity.remove();
+                if (xpEntity.value == 1) {
+                    xpEntity.remove();
                 //#endif
                 }
                 if (currentXp >= 8) {

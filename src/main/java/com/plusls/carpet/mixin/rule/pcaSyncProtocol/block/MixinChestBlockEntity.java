@@ -20,13 +20,13 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(ChestBlockEntity.class)
 public abstract class MixinChestBlockEntity extends RandomizableContainerBlockEntity {
     //#if MC > 11605
-    protected MixinChestBlockEntity(BlockEntityType<?> blockEntityType, BlockPos blockPos, BlockState blockState) {
-        super(blockEntityType, blockPos, blockState);
-    }
-    //#else
-    //$$ protected MixinChestBlockEntity(BlockEntityType<?> blockEntityType) {
-    //$$     super(blockEntityType);
+    //$$ protected MixinChestBlockEntity(BlockEntityType<?> blockEntityType, BlockPos blockPos, BlockState blockState) {
+    //$$     super(blockEntityType, blockPos, blockState);
     //$$ }
+    //#else
+    protected MixinChestBlockEntity(BlockEntityType<?> blockEntityType) {
+        super(blockEntityType);
+    }
     //#endif
 
     @Override

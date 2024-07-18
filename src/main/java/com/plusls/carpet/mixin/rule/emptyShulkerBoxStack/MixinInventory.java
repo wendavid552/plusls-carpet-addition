@@ -51,9 +51,9 @@ public abstract class MixinInventory implements Container, Nameable {
     // 避免死循环
     @Redirect(
             //#if MC > 11605
-            method = "placeItemBackInInventory(Lnet/minecraft/world/item/ItemStack;Z)V",
+            //$$ method = "placeItemBackInInventory(Lnet/minecraft/world/item/ItemStack;Z)V",
             //#else
-            //$$ method = "placeItemBackInInventory",
+            method = "placeItemBackInInventory",
             //#endif
             at = @At(
                     value = "INVOKE",

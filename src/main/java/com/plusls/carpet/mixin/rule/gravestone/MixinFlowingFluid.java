@@ -28,9 +28,9 @@ public abstract class MixinFlowingFluid extends Fluid {
             BlockEntity blockEntity = blockGetter.getBlockEntity(pos);
             if (blockEntity != null) {
                 //#if MC > 11701
-                CompoundTag nbt = blockEntity.saveWithoutMetadata();
+                //$$ CompoundTag nbt = blockEntity.saveWithoutMetadata();
                 //#else
-                //$$ CompoundTag nbt = blockEntity.save(new CompoundTag());
+                CompoundTag nbt = blockEntity.save(new CompoundTag());
                 //#endif
                 if (nbt.contains("DeathInfo")) {
                     cir.setReturnValue(false);

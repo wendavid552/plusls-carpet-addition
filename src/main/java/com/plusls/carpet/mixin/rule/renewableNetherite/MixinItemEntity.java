@@ -75,9 +75,9 @@ public abstract class MixinItemEntity extends Entity {
             at = @At(
                     value = "INVOKE",
                     //#if MC > 11605
-                    target = "Lnet/minecraft/world/entity/item/ItemEntity;discard()V",
+                    //$$ target = "Lnet/minecraft/world/entity/item/ItemEntity;discard()V",
                     //#else
-                    //$$ target = "Lnet/minecraft/world/entity/item/ItemEntity;remove()V",
+                    target = "Lnet/minecraft/world/entity/item/ItemEntity;remove()V",
                     //#endif
                     ordinal = 0
             )
@@ -88,9 +88,9 @@ public abstract class MixinItemEntity extends Entity {
         }
         ServerLevel level = (ServerLevel) this.getLevelCompat();
         //#if MC > 11903
-        if (source == level.damageSources().lava() && level.dimension() == Level.NETHER) {
+        //$$ if (source == level.damageSources().lava() && level.dimension() == Level.NETHER) {
         //#else
-        //$$ if (source == DamageSource.LAVA && level.dimension() == Level.NETHER) {
+        if (source == DamageSource.LAVA && level.dimension() == Level.NETHER) {
         //#endif
             ItemStack stack = this.getItem();
             if (!stack.isEmpty() && stack.getMaxDamage() - stack.getDamageValue() == 1) {

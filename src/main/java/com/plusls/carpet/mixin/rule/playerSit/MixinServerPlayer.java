@@ -26,17 +26,17 @@ import top.hendrixshen.magiclib.util.MessageUtil;
 @Mixin(ServerPlayer.class)
 public abstract class MixinServerPlayer extends Player {
     //#if MC > 11902
-    public MixinServerPlayer(Level level, BlockPos blockPos, float f, GameProfile gameProfile) {
-        super(level, blockPos, f, gameProfile);
-    }
+    //$$ public MixinServerPlayer(Level level, BlockPos blockPos, float f, GameProfile gameProfile) {
+    //$$     super(level, blockPos, f, gameProfile);
+    //$$ }
     //#elseif MC > 11802
     //$$ public MixinServerPlayer(Level level, BlockPos blockPos, float f, GameProfile gameProfile, @Nullable ProfilePublicKey profilePublicKey) {
     //$$     super(level, blockPos, f, gameProfile, profilePublicKey);
     //$$ }
     //#elseif MC > 11502
-    //$$ public MixinServerPlayer(Level level, BlockPos blockPos, float f, GameProfile gameProfile) {
-    //$$     super(level, blockPos, f, gameProfile);
-    //$$ }
+    public MixinServerPlayer(Level level, BlockPos blockPos, float f, GameProfile gameProfile) {
+        super(level, blockPos, f, gameProfile);
+    }
     //#else
     //$$ public MixinServerPlayer(Level level, GameProfile gameProfile) {
     //$$     super(level, gameProfile);
@@ -86,7 +86,7 @@ public abstract class MixinServerPlayer extends Player {
                 ci.cancel();
             }
 
-            if (this.onGround()) {
+            if (this.isOnGround()) {
                 this.pca$sneakTimes++;
             }
 
@@ -102,10 +102,10 @@ public abstract class MixinServerPlayer extends Player {
                     this.connection.send(new ClientboundSetEntityDataPacket(
                             this.getId(),
                             //#if MC > 11902
-                            this.getEntityData().getNonDefaultValues()
+                            //$$ this.getEntityData().getNonDefaultValues()
                             //#else
-                            //$$ this.getEntityData(),
-                            //$$ true
+                            this.getEntityData(),
+                            true
                             //#endif
                     ));
                 }

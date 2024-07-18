@@ -1,7 +1,7 @@
 package com.plusls.carpet.mixin.rule.superLead;
 
 import com.plusls.carpet.PluslsCarpetAdditionSettings;
-import net.minecraft.world.entity.AgeableMob;
+import net.minecraft.world.entity.AgableMob;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.npc.AbstractVillager;
 import net.minecraft.world.entity.player.Player;
@@ -12,8 +12,8 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(AbstractVillager.class)
-public abstract class MixinAbstractVillager extends AgeableMob {
-    protected MixinAbstractVillager(EntityType<? extends AgeableMob> entityType, Level level) {
+public abstract class MixinAbstractVillager extends AgableMob {
+    protected MixinAbstractVillager(EntityType<? extends AgableMob> entityType, Level level) {
         super(entityType, level);
     }
 

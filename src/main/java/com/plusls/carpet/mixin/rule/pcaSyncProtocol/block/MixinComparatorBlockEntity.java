@@ -17,13 +17,13 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(ComparatorBlockEntity.class)
 public abstract class MixinComparatorBlockEntity extends BlockEntity {
     //#if MC > 11605
-    protected MixinComparatorBlockEntity(BlockEntityType<?> blockEntityType, BlockPos blockPos, BlockState blockState) {
-        super(blockEntityType, blockPos, blockState);
-    }
-    //#else
-    //$$ protected MixinComparatorBlockEntity(BlockEntityType<?> blockEntityType) {
-    //$$     super(blockEntityType);
+    //$$ protected MixinComparatorBlockEntity(BlockEntityType<?> blockEntityType, BlockPos blockPos, BlockState blockState) {
+    //$$     super(blockEntityType, blockPos, blockState);
     //$$ }
+    //#else
+    protected MixinComparatorBlockEntity(BlockEntityType<?> blockEntityType) {
+        super(blockEntityType);
+    }
     //#endif
 
     @Override

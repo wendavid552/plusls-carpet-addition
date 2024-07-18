@@ -17,13 +17,13 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(ShulkerBoxBlockEntity.class)
 public abstract class MixinShulkerBoxBlockEntity extends RandomizableContainerBlockEntity {
     //#if MC > 11605
-    protected MixinShulkerBoxBlockEntity(BlockEntityType<?> blockEntityType, BlockPos blockPos, BlockState blockState) {
-        super(blockEntityType, blockPos, blockState);
-    }
-    //#else
-    //$$ protected MixinShulkerBoxBlockEntity(BlockEntityType<?> blockEntityType) {
-    //$$     super(blockEntityType);
+    //$$ protected MixinShulkerBoxBlockEntity(BlockEntityType<?> blockEntityType, BlockPos blockPos, BlockState blockState) {
+    //$$     super(blockEntityType, blockPos, blockState);
     //$$ }
+    //#else
+    protected MixinShulkerBoxBlockEntity(BlockEntityType<?> blockEntityType) {
+        super(blockEntityType);
+    }
     //#endif
 
     @Override

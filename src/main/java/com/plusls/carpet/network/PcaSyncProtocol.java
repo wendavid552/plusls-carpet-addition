@@ -44,7 +44,7 @@ import java.util.concurrent.locks.ReentrantLock;
 //#endif
 
 //#if MC > 11802
-@SuppressWarnings("removal")
+//$$ @SuppressWarnings("removal")
 //#endif
 public class PcaSyncProtocol {
     public static final ReentrantLock lock = new ReentrantLock(true);
@@ -120,9 +120,9 @@ public class PcaSyncProtocol {
         //#endif
         buf.writeBlockPos(blockEntity.getBlockPos());
         //#if MC > 11701
-        buf.writeNbt(blockEntity.saveWithoutMetadata());
+        //$$ buf.writeNbt(blockEntity.saveWithoutMetadata());
         //#else
-        //$$ buf.writeNbt(new CompoundTag());
+        buf.writeNbt(new CompoundTag());
         //#endif
         ServerPlayNetworking.send(player, UPDATE_BLOCK_ENTITY, buf);
     }

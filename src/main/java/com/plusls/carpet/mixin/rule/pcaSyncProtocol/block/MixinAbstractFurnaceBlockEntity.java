@@ -17,13 +17,13 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(AbstractFurnaceBlockEntity.class)
 public abstract class MixinAbstractFurnaceBlockEntity extends BaseContainerBlockEntity {
     //#if MC > 11605
-    protected MixinAbstractFurnaceBlockEntity(BlockEntityType<?> blockEntityType, BlockPos blockPos, BlockState blockState) {
-        super(blockEntityType, blockPos, blockState);
-    }
-    //#else
-    //$$ protected MixinAbstractFurnaceBlockEntity(BlockEntityType<?> blockEntityType) {
-    //$$     super(blockEntityType);
+    //$$ protected MixinAbstractFurnaceBlockEntity(BlockEntityType<?> blockEntityType, BlockPos blockPos, BlockState blockState) {
+    //$$     super(blockEntityType, blockPos, blockState);
     //$$ }
+    //#else
+    protected MixinAbstractFurnaceBlockEntity(BlockEntityType<?> blockEntityType) {
+        super(blockEntityType);
+    }
     //#endif
 
     @Override

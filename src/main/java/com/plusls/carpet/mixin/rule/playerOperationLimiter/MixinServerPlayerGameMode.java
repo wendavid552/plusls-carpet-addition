@@ -19,7 +19,7 @@ import net.minecraft.network.protocol.game.ClientboundBlockUpdatePacket;
 //$$ import net.minecraft.network.protocol.game.ClientboundBlockBreakAckPacket;
 //#endif
 //#if MC <= 11802
-//$$ import net.minecraft.network.protocol.game.ServerboundPlayerActionPacket;
+import net.minecraft.network.protocol.game.ServerboundPlayerActionPacket;
 //#endif
 
 @Mixin(ServerPlayerGameMode.class)
@@ -34,8 +34,8 @@ public abstract class MixinServerPlayerGameMode {
     protected ServerLevel level;
 
     //#if MC > 11802
-    @Shadow
-    protected abstract void debugLogging(BlockPos blockPos, boolean bl, int sequence, String reason);
+    //$$ @Shadow
+    //$$ protected abstract void debugLogging(BlockPos blockPos, boolean bl, int sequence, String reason);
     //#endif
 
     @Inject(
@@ -48,16 +48,16 @@ public abstract class MixinServerPlayerGameMode {
             cancellable = true
     )
     //#if MC > 11802
-    private void checkOperationCountPerTick(BlockPos pos, int sequence, String reason, CallbackInfo ci) {
+    //$$ private void checkOperationCountPerTick(BlockPos pos, int sequence, String reason, CallbackInfo ci) {
     //#elseif MC > 11404
-    //$$ private void checkOperationCountPerTick(BlockPos pos, ServerboundPlayerActionPacket.Action action, String reason, CallbackInfo ci) {
+    private void checkOperationCountPerTick(BlockPos pos, ServerboundPlayerActionPacket.Action action, String reason, CallbackInfo ci) {
     //#else
     //$$ private void checkOperationCountPerTick(BlockPos pos, ServerboundPlayerActionPacket.Action action, CallbackInfo ci) {
     //#endif
         //#if MC > 11802
-        if (!PluslsCarpetAdditionSettings.playerOperationLimiter || !reason.equals(pca$instaMineReason)) {
+        //$$ if (!PluslsCarpetAdditionSettings.playerOperationLimiter || !reason.equals(pca$instaMineReason)) {
         //#else
-        //$$ if (!PluslsCarpetAdditionSettings.playerOperationLimiter) {
+        if (!PluslsCarpetAdditionSettings.playerOperationLimiter) {
         //#endif
             return;
         }
@@ -72,7 +72,7 @@ public abstract class MixinServerPlayerGameMode {
             //$$ this.player.connection.send(new ClientboundBlockBreakAckPacket(pos, this.level.getBlockState(pos), action, false));
             //#endif
             //#if MC > 11802
-            this.debugLogging(pos, false, sequence, reason);
+            //$$ this.debugLogging(pos, false, sequence, reason);
             //#endif
             ci.cancel();
         }

@@ -47,7 +47,7 @@ public class MixinBlockRotator {
             //#else
             //$$ CarpetSettings.impendingFillSkipUpdates = true;
             //#endif
-            boolean ret = BlockRotator.flipBlock(state, level, player, hand, hit);
+            boolean ret = BlockRotator.flip_block(state, level, player, hand, hit);
             //#if MC > 11502
             CarpetSettings.impendingFillSkipUpdates.set(false);
             //#else

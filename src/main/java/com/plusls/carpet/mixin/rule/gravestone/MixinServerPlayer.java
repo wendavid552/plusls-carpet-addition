@@ -27,17 +27,17 @@ import net.minecraft.core.BlockPos;
 @Mixin(ServerPlayer.class)
 public abstract class MixinServerPlayer extends Player {
     //#if MC > 11902
-    public MixinServerPlayer(Level level, BlockPos blockPos, float f, GameProfile gameProfile) {
-        super(level, blockPos, f, gameProfile);
-    }
+    //$$ public MixinServerPlayer(Level level, BlockPos blockPos, float f, GameProfile gameProfile) {
+    //$$     super(level, blockPos, f, gameProfile);
+    //$$ }
     //#elseif MC > 11802
     //$$ public MixinServerPlayer(Level level, BlockPos blockPos, float f, GameProfile gameProfile, @Nullable ProfilePublicKey profilePublicKey) {
     //$$     super(level, blockPos, f, gameProfile, profilePublicKey);
     //$$ }
     //#elseif MC > 11502
-    //$$ public MixinServerPlayer(Level level, BlockPos blockPos, float f, GameProfile gameProfile) {
-    //$$     super(level, blockPos, f, gameProfile);
-    //$$ }
+    public MixinServerPlayer(Level level, BlockPos blockPos, float f, GameProfile gameProfile) {
+        super(level, blockPos, f, gameProfile);
+    }
     //#else
     //$$ public MixinServerPlayer(Level level, GameProfile gameProfile) {
     //$$     super(level, gameProfile);

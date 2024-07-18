@@ -15,37 +15,37 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 //#if MC > 11605
-import net.minecraft.world.level.Level;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-
-import java.util.function.BooleanSupplier;
+//$$ import net.minecraft.world.level.Level;
+//$$ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+//$$
+//$$ import java.util.function.BooleanSupplier;
 //#endif
 
 @Mixin(HopperBlockEntity.class)
 public abstract class MixinHopperBlockEntity extends RandomizableContainerBlockEntity {
     //#if MC > 11605
-    protected MixinHopperBlockEntity(BlockEntityType<?> blockEntityType, BlockPos blockPos, BlockState blockState) {
-        super(blockEntityType, blockPos, blockState);
-    }
-    //#else
-    //$$ protected MixinHopperBlockEntity(BlockEntityType<?> blockEntityType) {
-    //$$     super(blockEntityType);
+    //$$ protected MixinHopperBlockEntity(BlockEntityType<?> blockEntityType, BlockPos blockPos, BlockState blockState) {
+    //$$     super(blockEntityType, blockPos, blockState);
     //$$ }
+    //#else
+    protected MixinHopperBlockEntity(BlockEntityType<?> blockEntityType) {
+        super(blockEntityType);
+    }
     //#endif
 
     //#if MC > 11605
-    @Inject(
-            method = "tryMoveItems",
-            at = @At(
-                    value = "INVOKE",
-                    target = "Lnet/minecraft/world/level/block/entity/HopperBlockEntity;setChanged(Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;)V"
-            )
-    )
-    private static void onSetChanged(Level world, BlockPos pos, BlockState state, HopperBlockEntity blockEntity, BooleanSupplier booleanSupplier, CallbackInfoReturnable<Boolean> cir) {
-        if (PluslsCarpetAdditionSettings.pcaSyncProtocol && PcaSyncProtocol.syncBlockEntityToClient(blockEntity)) {
-            PluslsCarpetAdditionReference.getLogger().debug("update HopperBlockEntity: {}", pos);
-        }
-    }
+    //$$ @Inject(
+    //$$         method = "tryMoveItems",
+    //$$         at = @At(
+    //$$                 value = "INVOKE",
+    //$$                 target = "Lnet/minecraft/world/level/block/entity/HopperBlockEntity;setChanged(Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;)V"
+    //$$         )
+    //$$ )
+    //$$ private static void onSetChanged(Level world, BlockPos pos, BlockState state, HopperBlockEntity blockEntity, BooleanSupplier booleanSupplier, CallbackInfoReturnable<Boolean> cir) {
+    //$$     if (PluslsCarpetAdditionSettings.pcaSyncProtocol && PcaSyncProtocol.syncBlockEntityToClient(blockEntity)) {
+    //$$         PluslsCarpetAdditionReference.getLogger().debug("update HopperBlockEntity: {}", pos);
+    //$$     }
+    //$$ }
     //#endif
 
     @Override

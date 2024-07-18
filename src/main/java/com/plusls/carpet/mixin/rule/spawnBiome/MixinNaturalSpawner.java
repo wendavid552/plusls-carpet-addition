@@ -12,15 +12,15 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import net.minecraft.resources.ResourceKey;
 //#endif
 //#if MC > 11701
-import net.minecraft.core.Holder;
-import org.jetbrains.annotations.NotNull;
+//$$ import net.minecraft.core.Holder;
+//$$ import org.jetbrains.annotations.NotNull;
 //#endif
 //#if MC > 11902
-import net.minecraft.core.HolderGetter;
-import net.minecraft.core.registries.Registries;
-import net.minecraft.data.registries.VanillaRegistries;
+//$$ import net.minecraft.core.HolderGetter;
+//$$ import net.minecraft.core.registries.Registries;
+//$$ import net.minecraft.data.registries.VanillaRegistries;
 //#elseif MC > 11502
-//$$ import net.minecraft.data.BuiltinRegistries;
+import net.minecraft.data.BuiltinRegistries;
 //#else
 //$$ import net.minecraft.core.BlockPos;
 //$$ import net.minecraft.world.entity.MobCategory;
@@ -31,7 +31,7 @@ import net.minecraft.data.registries.VanillaRegistries;
 @Mixin(NaturalSpawner.class)
 public class MixinNaturalSpawner {
     //#if MC > 11902
-    private static final HolderGetter<Biome> pca$lookup = VanillaRegistries.createLookup().asGetterLookup().lookupOrThrow(Registries.BIOME);
+    //$$ private static final HolderGetter<Biome> pca$lookup = VanillaRegistries.createLookup().asGetterLookup().lookupOrThrow(Registries.BIOME);
     //#endif
 
     //#if MC > 11502
@@ -44,9 +44,9 @@ public class MixinNaturalSpawner {
             argsOnly = true
     )
     //#if MC > 11701
-    private static Holder<Biome> modifyBiome(Holder<Biome> biome) {
+    //$$ private static Holder<Biome> modifyBiome(Holder<Biome> biome) {
     //#else
-    //$$ private static Biome modifyBiome(Biome biome) {
+    private static Biome modifyBiome(Biome biome) {
     //#endif
         if (PluslsCarpetAdditionSettings.spawnBiome != PluslsCarpetAdditionSettings.PCA_SPAWN_BIOME.DEFAULT) {
             if (PluslsCarpetAdditionSettings.spawnBiome == PluslsCarpetAdditionSettings.PCA_SPAWN_BIOME.DESERT) {
@@ -63,18 +63,18 @@ public class MixinNaturalSpawner {
     }
 
     //#if MC > 11701
-    private static @NotNull Holder<Biome> pca$getBiome(ResourceKey<Biome> biome) {
+    //$$ private static @NotNull Holder<Biome> pca$getBiome(ResourceKey<Biome> biome) {
     //#elseif MC > 11502
-    //$$ private static Biome pca$getBiome(ResourceKey<Biome> biome) {
+    private static Biome pca$getBiome(ResourceKey<Biome> biome) {
     //#else
     //$$ private static Biome pca$getBiome(Biome biome) {
     //#endif
         //#if MC > 11902
-        return pca$lookup.getOrThrow(biome);
+        //$$ return pca$lookup.getOrThrow(biome);
         //#elseif MC > 11701
         //$$ return Holder.direct(BuiltinRegistries.BIOME.get(biome));
         //#elseif MC > 11502
-        //$$ return BuiltinRegistries.BIOME.get(biome);
+        return BuiltinRegistries.BIOME.get(biome);
         //#endif
     }
     //#else

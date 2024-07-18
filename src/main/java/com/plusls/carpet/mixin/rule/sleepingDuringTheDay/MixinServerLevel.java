@@ -21,19 +21,19 @@ import java.util.function.Supplier;
 //$$ import java.util.function.BiFunction;
 //#endif
 //#if MC > 11701
-import net.minecraft.core.Holder;
+//$$ import net.minecraft.core.Holder;
 //#endif
 
 //#if MC > 11903
-import net.minecraft.core.RegistryAccess;
+//$$ import net.minecraft.core.RegistryAccess;
 //#endif
 
 @Mixin(ServerLevel.class)
 public abstract class MixinServerLevel extends Level {
     //#if MC > 11903
-    protected MixinServerLevel(WritableLevelData properties, ResourceKey<Level> registryRef, RegistryAccess registryAccess, Holder<DimensionType> dimension, Supplier<ProfilerFiller> profiler, boolean isClient, boolean debugWorld, long seed, int maxChainedNeighborUpdates) {
-        super(properties, registryRef, registryAccess, dimension, profiler, isClient, debugWorld, seed, maxChainedNeighborUpdates);
-    }
+    //$$ protected MixinServerLevel(WritableLevelData properties, ResourceKey<Level> registryRef, RegistryAccess registryAccess, Holder<DimensionType> dimension, Supplier<ProfilerFiller> profiler, boolean isClient, boolean debugWorld, long seed, int maxChainedNeighborUpdates) {
+    //$$     super(properties, registryRef, registryAccess, dimension, profiler, isClient, debugWorld, seed, maxChainedNeighborUpdates);
+    //$$ }
     //#elseif MC > 11802
     //$$ protected MixinServerLevel(WritableLevelData properties, ResourceKey<Level> registryRef, Holder<DimensionType> dimension, Supplier<ProfilerFiller> profiler, boolean isClient, boolean debugWorld, long seed, int maxChainedNeighborUpdates) {
     //$$     super(properties, registryRef, dimension, profiler, isClient, debugWorld, seed, maxChainedNeighborUpdates);
@@ -43,9 +43,9 @@ public abstract class MixinServerLevel extends Level {
     //$$     super(properties, registryRef, dimension, profiler, isClient, debugWorld, seed);
     //$$ }
     //#elseif MC > 11502
-    //$$ protected MixinServerLevel(WritableLevelData properties, ResourceKey<Level> registryRef, DimensionType dimension, Supplier<ProfilerFiller> profiler, boolean isClient, boolean debugWorld, long seed) {
-    //$$     super(properties, registryRef, dimension, profiler, isClient, debugWorld, seed);
-    //$$ }
+    protected MixinServerLevel(WritableLevelData properties, ResourceKey<Level> registryRef, DimensionType dimension, Supplier<ProfilerFiller> profiler, boolean isClient, boolean debugWorld, long seed) {
+        super(properties, registryRef, dimension, profiler, isClient, debugWorld, seed);
+    }
     //#else
     //$$ protected MixinServerLevel(LevelData levelData, DimensionType dimensionType, BiFunction<Level, Dimension, ChunkSource> biFunction, ProfilerFiller profilerFiller, boolean bl) {
     //$$     super(levelData, dimensionType, biFunction, profilerFiller, bl);

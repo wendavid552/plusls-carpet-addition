@@ -21,7 +21,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 //#if MC <= 11701
-//$$ import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.CompoundTag;
 //#endif
 
 @Mixin(DyeItem.class)
@@ -66,9 +66,9 @@ public abstract class MixinDyeItem extends Item {
                     assert blockEntity != null;
                     assert newBlockEntity != null;
                     //#if MC > 11701
-                    newBlockEntity.loadFromTag(blockEntity.saveWithoutMetadata());
+                    //$$ newBlockEntity.loadFromTag(blockEntity.saveWithoutMetadata());
                     //#else
-                    //$$ newBlockEntity.loadFromTag(new CompoundTag());
+                    newBlockEntity.loadFromTag(new CompoundTag());
                     //#endif
                     newBlockEntity.setCustomName(blockEntity.getCustomName());
                     newBlockEntity.setChanged();

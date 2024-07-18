@@ -12,10 +12,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import top.hendrixshen.magiclib.compat.minecraft.api.nbt.TagCompatApi;
 
 //#if MC <= 11701
-//$$ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 //#endif
 //#if MC <= 11605
-//$$ import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.BlockState;
 //#endif
 
 @Mixin(SkullBlockEntity.class)
@@ -39,9 +39,9 @@ public class MixinSkullBlockEntity implements MySkullBlockEntity {
             )
     )
     //#if MC > 11605
-    private void postLoad(@NotNull CompoundTag compoundTag, CallbackInfo ci) {
+    //$$ private void postLoad(@NotNull CompoundTag compoundTag, CallbackInfo ci) {
     //#elseif MC > 11502
-    //$$ private void postLoad(BlockState blockState, @NotNull CompoundTag compoundTag, CallbackInfo ci) {
+    private void postLoad(BlockState blockState, @NotNull CompoundTag compoundTag, CallbackInfo ci) {
     //#else
     //$$ private void postLoad(@NotNull CompoundTag compoundTag, CallbackInfo ci) {
     //#endif
@@ -52,18 +52,18 @@ public class MixinSkullBlockEntity implements MySkullBlockEntity {
 
     @Inject(
             //#if MC > 11701
-            method = "saveAdditional",
+            //$$ method = "saveAdditional",
             //#else
-            //$$ method = "save",
+            method = "save",
             //#endif
             at = @At(
                     value = "RETURN"
             )
     )
     //#if MC > 11701
-    private void postSaveAdditional(CompoundTag compoundTag, CallbackInfo ci) {
+    //$$ private void postSaveAdditional(CompoundTag compoundTag, CallbackInfo ci) {
     //#else
-    //$$ private void postSave(CompoundTag compoundTag, CallbackInfoReturnable<CompoundTag> cir) {
+    private void postSave(CompoundTag compoundTag, CallbackInfoReturnable<CompoundTag> cir) {
     //#endif
         if (this.pca$deathInfo != null) {
             compoundTag.put("DeathInfo", this.pca$deathInfo.toTag());

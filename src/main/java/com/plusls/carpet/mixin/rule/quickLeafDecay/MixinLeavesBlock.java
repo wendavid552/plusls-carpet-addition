@@ -15,9 +15,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 //$$ import net.minecraft.world.level.Level;
 //#endif
 //#if MC > 11802
-import net.minecraft.util.RandomSource;
+//$$ import net.minecraft.util.RandomSource;
 //#else
-//$$ import java.util.Random;
+import java.util.Random;
 //#endif
 
 @Mixin(LeavesBlock.class)
@@ -34,9 +34,9 @@ public abstract class MixinLeavesBlock extends Block {
             )
     )
     //#if MC > 11802
-    private void postScheduledTick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random, CallbackInfo ci) {
+    //$$ private void postScheduledTick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random, CallbackInfo ci) {
     //#elseif MC > 11404
-    //$$ private void postScheduledTick(BlockState state, ServerLevel level, BlockPos pos, Random random, CallbackInfo ci) {
+    private void postScheduledTick(BlockState state, ServerLevel level, BlockPos pos, Random random, CallbackInfo ci) {
     //#else
     //$$ private void postScheduledTick(BlockState state, Level level, BlockPos pos, Random random, CallbackInfo ci) {
     //#endif

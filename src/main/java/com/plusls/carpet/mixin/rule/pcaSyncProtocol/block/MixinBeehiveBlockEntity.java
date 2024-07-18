@@ -19,8 +19,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import java.util.List;
 
 //#if MC > 11605
-import net.minecraft.world.level.Level;
-import java.util.Objects;
+//$$ import net.minecraft.world.level.Level;
+//$$ import java.util.Objects;
 //#endif
 //#else
 //$$ import top.hendrixshen.magiclib.compat.preprocess.api.DummyClass;
@@ -36,13 +36,13 @@ public abstract class MixinBeehiveBlockEntity extends BlockEntity {
 //#endif
     //#if MC > 11404
     //#if MC > 11605
-    protected MixinBeehiveBlockEntity(BlockEntityType<?> blockEntityType, BlockPos blockPos, BlockState blockState) {
-        super(blockEntityType, blockPos, blockState);
-    }
-    //#else
-    //$$ protected MixinBeehiveBlockEntity(BlockEntityType<?> blockEntityType) {
-    //$$     super(blockEntityType);
+    //$$ protected MixinBeehiveBlockEntity(BlockEntityType<?> blockEntityType, BlockPos blockPos, BlockState blockState) {
+    //$$     super(blockEntityType, blockPos, blockState);
     //$$ }
+    //#else
+    protected MixinBeehiveBlockEntity(BlockEntityType<?> blockEntityType) {
+        super(blockEntityType);
+    }
     //#endif
 
     @Inject(
@@ -54,13 +54,13 @@ public abstract class MixinBeehiveBlockEntity extends BlockEntity {
             )
     )
     //#if MC > 11605
-    private static void postTickOccupants(Level level, BlockPos blockPos, BlockState blockState, List<BeehiveBlockEntity.BeeData> list, BlockPos blockPos2, CallbackInfo ci) {
-        if (PluslsCarpetAdditionSettings.pcaSyncProtocol && PcaSyncProtocol.syncBlockEntityToClient(Objects.requireNonNull(level.getBlockEntity(blockPos)))) {
-            PluslsCarpetAdditionReference.getLogger().debug("update BeehiveBlockEntity: {}", blockPos);
+    //$$ private static void postTickOccupants(Level level, BlockPos blockPos, BlockState blockState, List<BeehiveBlockEntity.BeeData> list, BlockPos blockPos2, CallbackInfo ci) {
+    //$$     if (PluslsCarpetAdditionSettings.pcaSyncProtocol && PcaSyncProtocol.syncBlockEntityToClient(Objects.requireNonNull(level.getBlockEntity(blockPos)))) {
+    //$$         PluslsCarpetAdditionReference.getLogger().debug("update BeehiveBlockEntity: {}", blockPos);
     //#else
-    //$$ private void postTickOccupants(CallbackInfo ci) {
-    //$$     if (PluslsCarpetAdditionSettings.pcaSyncProtocol && PcaSyncProtocol.syncBlockEntityToClient(this)) {
-    //$$         PluslsCarpetAdditionReference.getLogger().debug("update BeehiveBlockEntity: {}", this.worldPosition);
+    private void postTickOccupants(CallbackInfo ci) {
+        if (PluslsCarpetAdditionSettings.pcaSyncProtocol && PcaSyncProtocol.syncBlockEntityToClient(this)) {
+            PluslsCarpetAdditionReference.getLogger().debug("update BeehiveBlockEntity: {}", this.worldPosition);
     //#endif
         }
     }
@@ -84,9 +84,9 @@ public abstract class MixinBeehiveBlockEntity extends BlockEntity {
             )
     )
     //#if MC > 11605
-    public void postLoad(CompoundTag compoundTag, CallbackInfo ci) {
+    //$$ public void postLoad(CompoundTag compoundTag, CallbackInfo ci) {
     //#elseif MC > 11502
-    //$$ public void postLoad(BlockState blockState, CompoundTag compoundTag, CallbackInfo ci) {
+    public void postLoad(BlockState blockState, CompoundTag compoundTag, CallbackInfo ci) {
     //#else
     //$$ public void postLoad(CompoundTag compoundTag, CallbackInfo ci) {
     //#endif
@@ -100,9 +100,9 @@ public abstract class MixinBeehiveBlockEntity extends BlockEntity {
             at = @At(
                     value = "INVOKE",
                     //#if MC > 11605
-                    target = "Lnet/minecraft/world/entity/Entity;discard()V",
+                    //$$ target = "Lnet/minecraft/world/entity/Entity;discard()V",
                     //#else
-                    //$$ target = "Lnet/minecraft/world/entity/Entity;remove()V",
+                    target = "Lnet/minecraft/world/entity/Entity;remove()V",
                     //#endif
                     ordinal = 0
             )

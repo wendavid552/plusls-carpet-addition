@@ -26,10 +26,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import java.util.Objects;
 
 //#if MC <= 11802
-//$$ import org.spongepowered.asm.mixin.Intrinsic;
+import org.spongepowered.asm.mixin.Intrinsic;
 //#endif
 //#if MC <= 11701
-//$$ import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.CompoundTag;
 //#endif
 
 @Mixin(PotionItem.class)
@@ -39,22 +39,22 @@ public abstract class MixinPotionItem extends Item {
     }
 
     //#if MC <= 11802
-    //$$ @Override
-    //$$ @Intrinsic
-    //$$ public @NotNull InteractionResult useOn(UseOnContext useOnContext) {
-    //$$     return super.useOn(useOnContext);
-    //$$ }
+    @Override
+    @Intrinsic
+    public @NotNull InteractionResult useOn(UseOnContext useOnContext) {
+        return super.useOn(useOnContext);
+    }
     //#endif
 
     //#if MC <= 11802
-    //$$ @SuppressWarnings({"MixinAnnotationTarget", "UnresolvedMixinReference"})
+    @SuppressWarnings({"MixinAnnotationTarget", "UnresolvedMixinReference"})
     //#endif
     @Inject(
             //#if MC > 11802
-            method = "useOn",
+            //$$ method = "useOn",
             //#else
-            //$$ method = {"useOn" ,"method_7884"},
-            //$$ remap = false,
+            method = {"useOn" ,"method_7884"},
+            remap = false,
             //#endif
             at = @At(
                     value = "HEAD"
@@ -86,9 +86,9 @@ public abstract class MixinPotionItem extends Item {
                     assert blockEntity != null;
                     assert newBlockEntity != null;
                     //#if MC > 11701
-                    newBlockEntity.loadFromTag(blockEntity.saveWithoutMetadata());
+                    //$$ newBlockEntity.loadFromTag(blockEntity.saveWithoutMetadata());
                     //#else
-                    //$$ newBlockEntity.loadFromTag(new CompoundTag());
+                    newBlockEntity.loadFromTag(new CompoundTag());
                     //#endif
                     newBlockEntity.setCustomName(blockEntity.getCustomName());
                     newBlockEntity.setChanged();
@@ -99,9 +99,9 @@ public abstract class MixinPotionItem extends Item {
                 }
             }
             //#if MC > 11802
-            cir.setReturnValue(InteractionResult.sidedSuccess(level.isClientSide));
+            //$$ cir.setReturnValue(InteractionResult.sidedSuccess(level.isClientSide));
             //#else
-            //$$ cir.setReturnValue(level.isClientSide ? InteractionResult.SUCCESS : InteractionResult.PASS);
+            cir.setReturnValue(level.isClientSide ? InteractionResult.SUCCESS : InteractionResult.PASS);
             //#endif
         }
     }
