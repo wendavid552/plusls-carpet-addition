@@ -2,8 +2,9 @@ name: Feature Request
 description: Suggest an idea for this project.
 title: "[Feature Request] "
 labels:
-  - "enhancement"
-  - "pending"
+  - "type: enhancement"
+  - "resolution: unresolved"
+  - "status: pending"
 body:
   - type: markdown
     attributes:
