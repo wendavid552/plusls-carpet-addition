@@ -1,16 +1,16 @@
 package com.plusls.carpet.mixin.rule.pcaSyncProtocol.block;
 
-//#if MC > 11404
 import com.plusls.carpet.PluslsCarpetAdditionReference;
 import com.plusls.carpet.PluslsCarpetAdditionSettings;
-import com.plusls.carpet.network.PcaSyncProtocol;
-import net.minecraft.core.BlockPos;
+import com.plusls.carpet.impl.network.PcaSyncProtocol;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.block.entity.BeehiveBlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntity;
+
 import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraft.world.level.block.state.BlockState;
+import org.jetbrains.annotations.NotNull;
+import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -18,32 +18,37 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.List;
 
+//#if MC > 12004
+//$$ import net.minecraft.core.HolderLookup;
+//#endif
+
 //#if MC > 11605
+//$$ import net.minecraft.core.BlockPos;
 //$$ import net.minecraft.world.level.Level;
 //$$ import java.util.Objects;
 //#endif
-//#else
-//$$ import top.hendrixshen.magiclib.compat.preprocess.api.DummyClass;
-//#endif
-import org.spongepowered.asm.mixin.Mixin;
 
-//#if MC > 11404
+//#if MC > 11502
+import net.minecraft.world.level.block.state.BlockState;
+//#endif
+
 @Mixin(BeehiveBlockEntity.class)
 public abstract class MixinBeehiveBlockEntity extends BlockEntity {
-//#else
-//$$ @Mixin(DummyClass.class)
-//$$ public class MixinBeehiveBlockEntity {
-//#endif
-    //#if MC > 11404
-    //#if MC > 11605
-    //$$ protected MixinBeehiveBlockEntity(BlockEntityType<?> blockEntityType, BlockPos blockPos, BlockState blockState) {
-    //$$     super(blockEntityType, blockPos, blockState);
-    //$$ }
-    //#else
-    protected MixinBeehiveBlockEntity(BlockEntityType<?> blockEntityType) {
-        super(blockEntityType);
+    private MixinBeehiveBlockEntity(
+            BlockEntityType<?> blockEntityType
+            //#if MC > 11605
+            //$$ , BlockPos blockPos
+            //$$ , BlockState blockState
+            //#endif
+    ) {
+        super(
+                blockEntityType
+                //#if MC > 11605
+                //$$ , blockPos
+                //$$ , blockState
+                //#endif
+        );
     }
-    //#endif
 
     @Inject(
             method = "tickOccupants",
@@ -53,15 +58,35 @@ public abstract class MixinBeehiveBlockEntity extends BlockEntity {
                     shift = At.Shift.AFTER
             )
     )
-    //#if MC > 11605
-    //$$ private static void postTickOccupants(Level level, BlockPos blockPos, BlockState blockState, List<BeehiveBlockEntity.BeeData> list, BlockPos blockPos2, CallbackInfo ci) {
-    //$$     if (PluslsCarpetAdditionSettings.pcaSyncProtocol && PcaSyncProtocol.syncBlockEntityToClient(Objects.requireNonNull(level.getBlockEntity(blockPos)))) {
-    //$$         PluslsCarpetAdditionReference.getLogger().debug("update BeehiveBlockEntity: {}", blockPos);
-    //#else
-    private void postTickOccupants(CallbackInfo ci) {
-        if (PluslsCarpetAdditionSettings.pcaSyncProtocol && PcaSyncProtocol.syncBlockEntityToClient(this)) {
-            PluslsCarpetAdditionReference.getLogger().debug("update BeehiveBlockEntity: {}", this.worldPosition);
-    //#endif
+    private
+        //#if MC > 11605
+        //$$ static
+        //#endif
+    void postTickOccupants(
+            //#if MC > 11605
+            //$$ Level level,
+            //$$ BlockPos blockPos,
+            //$$ BlockState blockState,
+            //$$ List<BeehiveBlockEntity.BeeData> bees,
+            //$$ BlockPos flowerPos,
+            //#endif
+            CallbackInfo ci
+    ) {
+        if (PluslsCarpetAdditionSettings.pcaSyncProtocol && PcaSyncProtocol.syncBlockEntityToClient(
+                //#if MC > 11605
+                //$$ Objects.requireNonNull(level.getBlockEntity(blockPos))
+                //#else
+                this
+                //#endif
+        )) {
+            PluslsCarpetAdditionReference.getLogger().debug(
+                    "update BeehiveBlockEntity: {}",
+                    //#if MC > 11605
+                    //$$ blockPos
+                    //#else
+                    this.worldPosition
+                    //#endif
+            );
         }
     }
 
@@ -71,32 +96,44 @@ public abstract class MixinBeehiveBlockEntity extends BlockEntity {
                     value = "RETURN"
             )
     )
-    public void postReleaseAllOccupants(BlockState state, BeehiveBlockEntity.BeeReleaseStatus beeState, CallbackInfoReturnable<List<Entity>> cir) {
+    public void postReleaseAllOccupants(CallbackInfoReturnable<List<Entity>> cir) {
         if (PluslsCarpetAdditionSettings.pcaSyncProtocol && PcaSyncProtocol.syncBlockEntityToClient(this) && cir.getReturnValue() != null) {
             PluslsCarpetAdditionReference.getLogger().debug("update BeehiveBlockEntity: {}", this.worldPosition);
         }
     }
 
     @Inject(
+            //#if MC > 12004
+            //$$ method = "loadAdditional",
+            //#else
             method = "load",
+            //#endif
             at = @At(
                     value = "RETURN"
             )
     )
-    //#if MC > 11605
-    //$$ public void postLoad(CompoundTag compoundTag, CallbackInfo ci) {
-    //#elseif MC > 11502
-    public void postLoad(BlockState blockState, CompoundTag compoundTag, CallbackInfo ci) {
-    //#else
-    //$$ public void postLoad(CompoundTag compoundTag, CallbackInfo ci) {
-    //#endif
+    public void postLoad(
+            //#if MC > 11502 && MC < 11700
+            BlockState blockState,
+            //#endif
+            @NotNull CompoundTag compoundTag,
+            //#if MC > 12004
+            //$$ HolderLookup.Provider provider,
+            //#endif
+            CallbackInfo ci
+    ) {
         if (PluslsCarpetAdditionSettings.pcaSyncProtocol && PcaSyncProtocol.syncBlockEntityToClient(this)) {
             PluslsCarpetAdditionReference.getLogger().debug("update BeehiveBlockEntity: {}", this.worldPosition);
         }
     }
 
     @Inject(
+            //#if MC > 12004
+            //$$ method = "addOccupant",
+            //#else
             method = "addOccupantWithPresetTicks",
+            //#endif
+
             at = @At(
                     value = "INVOKE",
                     //#if MC > 11605
@@ -107,10 +144,9 @@ public abstract class MixinBeehiveBlockEntity extends BlockEntity {
                     ordinal = 0
             )
     )
-    public void postAddOccupantWithPresetTicks(Entity entity, boolean hasNectar, int ticksInHive, CallbackInfo ci) {
+    public void postAddOccupantWithPresetTicks(CallbackInfo ci) {
         if (PluslsCarpetAdditionSettings.pcaSyncProtocol && PcaSyncProtocol.syncBlockEntityToClient(this)) {
             PluslsCarpetAdditionReference.getLogger().debug("update BeehiveBlockEntity: {}", this.worldPosition);
         }
     }
-    //#endif
 }

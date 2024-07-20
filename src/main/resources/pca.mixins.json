@@ -4,6 +4,7 @@
   "package": "com.plusls.carpet.mixin",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
+    "accessor.AccessorBaseContainerBlockEntity",
     "rule.autoTrade.MixinDispenserBlock",
     "rule.autoTrade.MixinVillager",
     "rule.avoidAnvilTooExpensive.MixinAnvilMenu",
@@ -14,8 +15,8 @@
     "rule.flippingTotemOfUndying.MixinBlockRotator",
     "rule.forceRestock.MixinSpectralArrow",
     "rule.gravestone.MixinFlowingFluid",
-    "rule.gravestone.MixinServerPlayer",
     "rule.gravestone.MixinPlayerHeadBlock",
+    "rule.gravestone.MixinServerPlayer",
     "rule.gravestone.MixinSkullBlockEntity",
     "rule.pcaSyncProtocol.block.MixinAbstractFurnaceBlockEntity",
     "rule.pcaSyncProtocol.block.MixinBarrelBlockEntity",

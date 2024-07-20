@@ -2,29 +2,38 @@ package com.plusls.carpet.mixin.rule.pcaSyncProtocol.block;
 
 import com.plusls.carpet.PluslsCarpetAdditionReference;
 import com.plusls.carpet.PluslsCarpetAdditionSettings;
-import com.plusls.carpet.network.PcaSyncProtocol;
-import net.minecraft.core.BlockPos;
+import com.plusls.carpet.impl.network.PcaSyncProtocol;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.entity.ComparatorBlockEntity;
-import net.minecraft.world.level.block.state.BlockState;
 import org.spongepowered.asm.mixin.Intrinsic;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+//#if MC > 11605
+//$$ import net.minecraft.core.BlockPos;
+//$$ import net.minecraft.world.level.block.state.BlockState;
+//#endif
+
 @Mixin(ComparatorBlockEntity.class)
 public abstract class MixinComparatorBlockEntity extends BlockEntity {
-    //#if MC > 11605
-    //$$ protected MixinComparatorBlockEntity(BlockEntityType<?> blockEntityType, BlockPos blockPos, BlockState blockState) {
-    //$$     super(blockEntityType, blockPos, blockState);
-    //$$ }
-    //#else
-    protected MixinComparatorBlockEntity(BlockEntityType<?> blockEntityType) {
-        super(blockEntityType);
+    private MixinComparatorBlockEntity(
+            BlockEntityType<?> blockEntityType
+            //#if MC > 11605
+            //$$ , BlockPos blockPos
+            //$$ , BlockState blockState
+            //#endif
+    ) {
+        super(
+                blockEntityType
+                //#if MC > 11605
+                //$$ , blockPos
+                //$$ , blockState
+                //#endif
+        );
     }
-    //#endif
 
     @Override
     @Intrinsic

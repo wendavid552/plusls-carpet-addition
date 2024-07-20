@@ -2,7 +2,7 @@ package com.plusls.carpet.mixin.rule.pcaSyncProtocol.entity;
 
 import com.plusls.carpet.PluslsCarpetAdditionReference;
 import com.plusls.carpet.PluslsCarpetAdditionSettings;
-import com.plusls.carpet.network.PcaSyncProtocol;
+import com.plusls.carpet.impl.network.PcaSyncProtocol;
 import net.minecraft.world.Container;
 import net.minecraft.world.ContainerListener;
 import net.minecraft.world.SimpleContainer;

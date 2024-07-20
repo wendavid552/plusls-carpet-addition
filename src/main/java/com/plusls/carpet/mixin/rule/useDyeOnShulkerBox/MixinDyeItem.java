@@ -20,7 +20,11 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-//#if MC <= 11701
+//#if MC > 12004
+//$$ import com.plusls.carpet.mixin.accessor.AccessorBaseContainerBlockEntity;
+//#endif
+
+//#if MC < 11800
 import net.minecraft.nbt.CompoundTag;
 //#endif
 
@@ -51,35 +55,54 @@ public abstract class MixinDyeItem extends Item {
         if (!PluslsCarpetAdditionSettings.useDyeOnShulkerBox) {
             return;
         }
+
         Level level = context.getLevel();
         BlockPos pos = context.getClickedPos();
         BlockState blockState = level.getBlockState(pos);
 
         if (blockState.is(Blocks.SHULKER_BOX)) {
-            if (!level.isClientSide()) {
-                ShulkerBoxBlockEntity blockEntity = (ShulkerBoxBlockEntity) level.getBlockEntity(pos);
-                BlockState newBlockState = ShulkerBoxBlock.getBlockByColor(this.getDyeColor()).defaultBlockState().
-                        setValue(ShulkerBoxBlock.FACING, blockState.getValue(ShulkerBoxBlock.FACING));
-
-                if (level.setBlockAndUpdate(pos, newBlockState)) {
-                    ShulkerBoxBlockEntity newBlockEntity = (ShulkerBoxBlockEntity) level.getBlockEntity(pos);
-                    assert blockEntity != null;
-                    assert newBlockEntity != null;
-                    //#if MC > 11701
-                    //$$ newBlockEntity.loadFromTag(blockEntity.saveWithoutMetadata());
-                    //#else
-                    newBlockEntity.loadFromTag(new CompoundTag());
-                    //#endif
-                    newBlockEntity.setCustomName(blockEntity.getCustomName());
-                    newBlockEntity.setChanged();
-                    context.getItemInHand().shrink(1);
-                }
-            }
-            //#if MC > 11502
-            cir.setReturnValue(InteractionResult.sidedSuccess(level.isClientSide));
-            //#else
-            //$$ cir.setReturnValue(level.isClientSide ? InteractionResult.SUCCESS : InteractionResult.PASS);
-            //#endif
+            return;
         }
+
+        if (!level.isClientSide()) {
+            ShulkerBoxBlockEntity blockEntity = (ShulkerBoxBlockEntity) level.getBlockEntity(pos);
+            BlockState newBlockState = ShulkerBoxBlock.getBlockByColor(this.getDyeColor()).defaultBlockState().
+                    setValue(ShulkerBoxBlock.FACING, blockState.getValue(ShulkerBoxBlock.FACING));
+
+            if (level.setBlockAndUpdate(pos, newBlockState)) {
+                ShulkerBoxBlockEntity newBlockEntity = (ShulkerBoxBlockEntity) level.getBlockEntity(pos);
+                assert blockEntity != null;
+                assert newBlockEntity != null;
+                newBlockEntity.loadFromTag(
+                        //#if MC > 11701
+                        //$$ blockEntity.saveWithoutMetadata(
+                        //#if MC > 12004
+                        //$$         level.registryAccess()
+                        //#endif
+                        //$$ )
+                        //#else
+                        new CompoundTag()
+                        //#endif
+                        //#if MC > 12004
+                        //$$ , level.registryAccess()
+                        //#endif
+                );
+                //#if MC > 12004
+                //$$ ((AccessorBaseContainerBlockEntity) newBlockEntity).pca$setName(blockEntity.getCustomName());
+                //#else
+                newBlockEntity.setCustomName(blockEntity.getCustomName());
+                //#endif
+                newBlockEntity.setChanged();
+                context.getItemInHand().shrink(1);
+            }
+        }
+
+        cir.setReturnValue(
+                //#if MC > 11502
+                InteractionResult.sidedSuccess(level.isClientSide)
+                //#else
+                //$$ cir.setReturnValue(level.isClientSide ? InteractionResult.SUCCESS : InteractionResult.PASS);
+                //#endif
+        );
     }
 }

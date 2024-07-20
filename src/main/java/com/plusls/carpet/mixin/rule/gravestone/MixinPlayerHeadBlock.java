@@ -1,7 +1,7 @@
 package com.plusls.carpet.mixin.rule.gravestone;
 
 import com.plusls.carpet.util.rule.gravestone.DeathInfo;
-import com.plusls.carpet.util.rule.gravestone.MySkullBlockEntity;
+import com.plusls.carpet.util.rule.gravestone.GravesStoneSkullBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.stats.Stats;
 import net.minecraft.world.entity.ExperienceOrb;
@@ -28,8 +28,8 @@ public abstract class MixinPlayerHeadBlock extends SkullBlock {
         if (level.isClientSide()) {
             return;
         }
-        if (blockEntity instanceof MySkullBlockEntity ) {
-            DeathInfo deathInfo = ((MySkullBlockEntity) blockEntity).getDeathInfo();
+        if (blockEntity instanceof GravesStoneSkullBlockEntity) {
+            DeathInfo deathInfo = ((GravesStoneSkullBlockEntity) blockEntity).pca$getDeathInfo();
             if (deathInfo == null) {
                 super.playerDestroy(level, player, pos, state, blockEntity, stack);
             } else {

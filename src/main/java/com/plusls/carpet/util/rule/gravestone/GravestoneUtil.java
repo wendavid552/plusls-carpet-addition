@@ -22,12 +22,21 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 
+//#if MC > 12004
+//$$ import net.minecraft.world.item.component.ResolvableProfile;
+//#endif
+
 //#if MC > 11502
 import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
+import top.hendrixshen.magiclib.api.compat.minecraft.world.entity.player.PlayerCompat;
+import top.hendrixshen.magiclib.api.compat.minecraft.world.item.ItemStackCompat;
+import top.hendrixshen.magiclib.api.compat.minecraft.world.level.LevelCompat;
+import top.hendrixshen.magiclib.impl.compat.minecraft.world.level.dimension.DimensionWrapper;
 //#else
+//$$ import com.google.common.collect.Lists;
 //$$ import net.minecraft.world.level.dimension.DimensionType;
 //$$
-//$$ import java.util.ArrayList;
+//$$ import java.util.List;
 //#endif
 
 public class GravestoneUtil {
@@ -38,49 +47,55 @@ public class GravestoneUtil {
     //#if MC > 11502
     public static void init() {
         ServerPlayerEvents.ALLOW_DEATH.register((player, damageSource, damageAmount) -> {
-            deathHandle(player);
+            GravestoneUtil.deathHandle(player);
             return true;
         });
     }
     //#endif
 
     public static void deathHandle(@NotNull ServerPlayer player) {
-        Level world = player.getLevelCompat();
-        if (PluslsCarpetAdditionSettings.gravestone && !world.getGameRules().getBoolean(GameRules.RULE_KEEPINVENTORY)) {
+        PlayerCompat playerCompat = PlayerCompat.of(player);
+        LevelCompat levelCompat = playerCompat.getLevel();
+        Level level = levelCompat.get();
+
+        if (PluslsCarpetAdditionSettings.gravestone && !level.getGameRules().getBoolean(GameRules.RULE_KEEPINVENTORY)) {
             for (InteractionHand hand : InteractionHand.values()) {
                 ItemStack itemStack = player.getItemInHand(hand);
-                if (itemStack.is(Items.TOTEM_OF_UNDYING)) {
+
+                if (ItemStackCompat.of(itemStack).is(Items.TOTEM_OF_UNDYING)) {
                     return;
                 }
             }
+
             player.destroyVanishingCursedItems();
             //#if MC > 11502
             SimpleContainer inventory = new SimpleContainer(PLAYER_INVENTORY_SIZE);
-            for (ItemStack itemStack : player.getInventory().items) {
+
+            for (ItemStack itemStack : playerCompat.getInventory().items) {
                 inventory.addItem(itemStack);
             }
 
-            for (ItemStack itemStack : player.getInventory().armor) {
+            for (ItemStack itemStack : playerCompat.getInventory().armor) {
                 inventory.addItem(itemStack);
             }
 
-            for (ItemStack itemStack : player.getInventory().offhand) {
+            for (ItemStack itemStack : playerCompat.getInventory().offhand) {
                 inventory.addItem(itemStack);
             }
             //#else
-            //$$ ArrayList<ItemStack> inventory = new ArrayList<>();
+            //$$ List<ItemStack> inventory = Lists.newArrayList();
             //$$ inventory.addAll(player.inventory.items);
             //$$ inventory.addAll(player.inventory.armor);
             //$$ inventory.addAll(player.inventory.offhand);
             //#endif
             int xp = player.totalExperience / 2;
-            player.getInventory().clearContent();
+            playerCompat.getInventory().clearContent();
 
             // only need clear experienceLevel
             player.experienceLevel = 0;
             BlockPos gravePos = findGravePos(player);
-            Objects.requireNonNull(world.getServer()).tell(new TickTask(world.getServer().getTickCount(),
-                    placeGraveRunnable(world,
+            Objects.requireNonNull(level.getServer()).tell(new TickTask(level.getServer().getTickCount(),
+                    placeGraveRunnable(level,
                             gravePos,
                             new DeathInfo(System.currentTimeMillis(), xp, inventory),
                             player)));
@@ -89,23 +104,31 @@ public class GravestoneUtil {
 
     // find pos to place gravestone
     public static BlockPos findGravePos(@NotNull ServerPlayer player) {
+        PlayerCompat playerCompat = PlayerCompat.of(player);
+
         //#if MC > 11502
-        BlockPos.MutableBlockPos playerPos = player.blockPositionCompat().mutable();
+        BlockPos.MutableBlockPos playerPos = playerCompat.getBlockPosition().mutable();
         //#else
-        //$$ BlockPos.MutableBlockPos playerPos = new BlockPos.MutableBlockPos(player.blockPositionCompat());
+        //$$ BlockPos.MutableBlockPos playerPos = new BlockPos.MutableBlockPos(playerCompat.getBlockPosition());
         //#endif
-        playerPos.setY(clampY(player, playerPos.getY()));
-        if (canPlaceGrave(player, playerPos)) {
+        playerPos.setY(GravestoneUtil.clampY(player, playerPos.getY()));
+
+        if (GravestoneUtil.canPlaceGrave(player, playerPos)) {
             return playerPos;
         }
+
         BlockPos.MutableBlockPos gravePos = new BlockPos.MutableBlockPos();
+
         for (int x = playerPos.getX() + SEARCH_RANGE; x >= playerPos.getX() - SEARCH_RANGE; x--) {
             gravePos.setX(x);
             int minY = clampY(player, playerPos.getY() - SEARCH_RANGE);
+
             for (int y = clampY(player, playerPos.getY() + SEARCH_RANGE); y >= minY; y--) {
                 gravePos.setY(y);
+
                 for (int z = playerPos.getZ() + SEARCH_RANGE; z >= playerPos.getZ() - SEARCH_RANGE; z--) {
                     gravePos.setZ(z);
+
                     if (canPlaceGrave(player, gravePos)) {
                         return drop(player, gravePos);
                     }
@@ -115,54 +138,61 @@ public class GravestoneUtil {
 
         // search up
         gravePos.set(playerPos);
-        while (player.getLevelCompat().getBlockState(gravePos).getBlock() == Blocks.BEDROCK) {
+
+        while (playerCompat.getLevel().get().getBlockState(gravePos).getBlock() == Blocks.BEDROCK) {
             gravePos.setY(gravePos.getY() + 1);
         }
+
         return gravePos;
     }
 
     // make sure to spawn graves on the suitable place
     public static int clampY(@NotNull ServerPlayer player, int y) {
         //don't spawn on nether ceiling, unless the player is already there.
-        //#if MC > 11502
-        if (player.getLevelCompat().dimension() == Level.NETHER && y < NETHER_BEDROCK_MAX_Y) {
-        //#else
-        //$$ if (player.dimension == DimensionType.NETHER && y < NETHER_BEDROCK_MAX_Y) {
-        //#endif
+        PlayerCompat playerCompat = PlayerCompat.of(player);
+        LevelCompat levelCompat = playerCompat.getLevel();
+
+        if (DimensionWrapper.of(levelCompat.get()).equals(DimensionWrapper.NETHER) &&
+                y < NETHER_BEDROCK_MAX_Y) {
             //clamp to 1 -- don't spawn graves the layer right above the void, so players can actually recover their items.
-            return Mth.clamp(y, player.getLevelCompat().getMinBuildHeight() + 1, NETHER_BEDROCK_MAX_Y - 1);
+            return Mth.clamp(y, levelCompat.getMinBuildHeight() + 1, NETHER_BEDROCK_MAX_Y - 1);
         } else {
-            return Mth.clamp(y, player.getLevelCompat().getMinBuildHeight() + 1, player.getLevelCompat().getMaxBuildHeight() - 1);
+            return Mth.clamp(y, levelCompat.getMinBuildHeight() + 1, levelCompat.get().getMaxBuildHeight() - 1);
         }
     }
 
-
     public static boolean canPlaceGrave(@NotNull ServerPlayer player, BlockPos pos) {
+        LevelCompat levelCompat = PlayerCompat.of(player).getLevel();
+        BlockState state = levelCompat.get().getBlockState(pos);
 
-        BlockState state = player.getLevelCompat().getBlockState(pos);
-        if (pos.getY() <= player.getLevelCompat().getMinBuildHeight() + 1 || pos.getY() >= player.getLevelCompat().getMaxBuildHeight() - 1) {
+        if (pos.getY() <= levelCompat.getMinBuildHeight() + 1 ||
+                pos.getY() >= levelCompat.get().getMaxBuildHeight() - 1) {
             return false;
         } else if (state.isAir()) {
             return true;
+        } else { // block can replace
+            return state.canBeReplaced(new DirectionalPlaceContext(levelCompat.get(), pos,
+                    Direction.DOWN, ItemStack.EMPTY, Direction.UP));
         }
-        // block can replace
-        else return state.canBeReplaced(
-                    new DirectionalPlaceContext(player.getLevelCompat(), pos, Direction.DOWN, ItemStack.EMPTY, Direction.UP));
     }
 
     // players are blown up
     // reduce y pos
     public static BlockPos drop(@NotNull ServerPlayer player, BlockPos pos) {
+        LevelCompat levelCompat = PlayerCompat.of(player).getLevel();
         BlockPos.MutableBlockPos searchPos = new BlockPos.MutableBlockPos().set(pos);
         int i = 0;
-        for (int y = pos.getY() - 1; y > player.getLevelCompat().getMinBuildHeight() + 1 && i < 10; y--) {
+
+        for (int y = pos.getY() - 1; y > levelCompat.getMinBuildHeight() + 1 && i < 10; y--) {
             i++;
             searchPos.setY(clampY(player, y));
-            if (!player.getLevelCompat().getBlockState(searchPos).isAir()) {
+
+            if (!levelCompat.get().getBlockState(searchPos).isAir()) {
                 searchPos.setY(clampY(player, y + 1));
                 return searchPos;
             }
         }
+
         return pos;
     }
 
@@ -177,8 +207,14 @@ public class GravestoneUtil {
                         pos.getX(), pos.getY(), pos.getZ()));
             }
             SkullBlockEntity graveEntity = (SkullBlockEntity) Objects.requireNonNull(world.getBlockEntity(pos));
-            graveEntity.setOwner(player.getGameProfile());
-            ((MySkullBlockEntity) graveEntity).setDeathInfo(deathInfo);
+            graveEntity.setOwner(
+                    //#if MC > 12004
+                    //$$ new ResolvableProfile(player.getGameProfile())
+                    //#else
+                    player.getGameProfile()
+                    //#endif
+            );
+            ((GravesStoneSkullBlockEntity) graveEntity).pca$setDeathInfo(deathInfo);
             graveEntity.setChanged();
         };
     }

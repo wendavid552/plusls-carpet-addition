@@ -28,11 +28,19 @@ public abstract class MixinInventory implements Container, Nameable {
             method = "hasRemainingSpaceForItem",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/world/item/ItemStack;getMaxStackSize()I",
-                    ordinal = 0
+                    //#if MC > 12004
+                    //$$ target = "Lnet/minecraft/world/entity/player/Inventory;getMaxStackSize(Lnet/minecraft/world/item/ItemStack;)I"
+                    //#else
+                    target = "Lnet/minecraft/world/item/ItemStack;getMaxStackSize()I"
+                    //#endif
             )
     )
-    private int canStackAddMoreGetMaxCount(ItemStack itemStack) {
+    private int canStackAddMoreGetMaxCount(
+            //#if MC > 12004
+            //$$ Inventory instance,
+            //#endif
+            ItemStack itemStack
+    ) {
         return ShulkerBoxItemUtil.getMaxCount(itemStack);
     }
 
@@ -40,11 +48,19 @@ public abstract class MixinInventory implements Container, Nameable {
             method = "addResource(ILnet/minecraft/world/item/ItemStack;)I",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/world/item/ItemStack;getMaxStackSize()I",
-                    ordinal = -1
+                    //#if MC > 12004
+                    //$$ target = "Lnet/minecraft/world/entity/player/Inventory;getMaxStackSize(Lnet/minecraft/world/item/ItemStack;)I"
+                    //#else
+                    target = "Lnet/minecraft/world/item/ItemStack;getMaxStackSize()I"
+                    //#endif
             )
     )
-    private int addStackGetMaxCount(ItemStack itemStack) {
+    private int addStackGetMaxCount(
+            //#if MC > 12004
+            //$$ Inventory instance,
+            //#endif
+            ItemStack itemStack
+    ) {
         return ShulkerBoxItemUtil.getMaxCount(itemStack);
     }
 

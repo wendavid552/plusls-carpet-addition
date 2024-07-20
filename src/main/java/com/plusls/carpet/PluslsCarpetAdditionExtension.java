@@ -1,7 +1,7 @@
 package com.plusls.carpet;
 
 import com.mojang.brigadier.CommandDispatcher;
-import com.plusls.carpet.network.PcaSyncProtocol;
+import com.plusls.carpet.impl.network.PcaSyncProtocol;
 import com.plusls.carpet.util.rule.flippingTotemOfUndying.FlipCooldown;
 import lombok.Getter;
 import net.minecraft.commands.CommandSourceStack;
@@ -19,7 +19,7 @@ public class PluslsCarpetAdditionExtension implements CarpetExtensionCompatApi {
     private static final PluslsCarpetAdditionSettingManager settingsManager = new PluslsCarpetAdditionSettingManager(
             PluslsCarpetAdditionReference.getModVersion(),
             PluslsCarpetAdditionReference.getModIdentifier(),
-            PluslsCarpetAdditionReference.getModNameCurrent());
+            PluslsCarpetAdditionReference.getModName());
     @Getter
     private static MinecraftServer server;
 

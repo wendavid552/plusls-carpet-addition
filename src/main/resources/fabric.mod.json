@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "id": "${mod_id}-${minecraft_version_id}",
+  "id": "${mod_id}",
   "version": "${mod_version}",
   "icon": "assets/${mod_id}/icon.png",
   "name": "${mod_name}",
@@ -32,7 +32,7 @@
   "depends": {
     "carpet": "*",
     "fabric": "*",
-    "magiclib-${minecraft_version_id}": ">=${magiclib_dependency}",
+    "magiclib": ">=${magiclib_dependency}",
     "minecraft": "${minecraft_dependency}"
   },
   "custom": {

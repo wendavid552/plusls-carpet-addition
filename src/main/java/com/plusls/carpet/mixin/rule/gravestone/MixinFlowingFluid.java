@@ -24,18 +24,28 @@ public abstract class MixinFlowingFluid extends Fluid {
             cancellable = true
     )
     private void checkRail(BlockGetter blockGetter, BlockPos pos, BlockState state, Fluid fluid, @NotNull CallbackInfoReturnable<Boolean> cir) {
-        if (cir.getReturnValue() && state.getBlock() instanceof PlayerHeadBlock) {
-            BlockEntity blockEntity = blockGetter.getBlockEntity(pos);
-            if (blockEntity != null) {
-                //#if MC > 11701
-                //$$ CompoundTag nbt = blockEntity.saveWithoutMetadata();
-                //#else
-                CompoundTag nbt = blockEntity.save(new CompoundTag());
-                //#endif
-                if (nbt.contains("DeathInfo")) {
-                    cir.setReturnValue(false);
-                }
-            }
+        if (!cir.getReturnValue() || !(state.getBlock() instanceof PlayerHeadBlock)) {
+            return;
+        }
+
+        BlockEntity blockEntity = blockGetter.getBlockEntity(pos);
+
+        if (blockEntity == null) {
+            return;
+        }
+
+        //#if MC > 11701
+        //$$ CompoundTag nbt = blockEntity.saveWithoutMetadata(
+        //#if MC > 12004
+        //$$         blockEntity.getLevel().registryAccess()
+        //#endif
+        //$$ );
+        //#else
+        CompoundTag nbt = blockEntity.save(new CompoundTag());
+        //#endif
+
+        if (nbt.contains("DeathInfo")) {
+            cir.setReturnValue(false);
         }
     }
 }

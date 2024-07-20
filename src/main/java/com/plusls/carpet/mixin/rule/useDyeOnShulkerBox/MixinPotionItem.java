@@ -22,13 +22,18 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import top.hendrixshen.magiclib.api.compat.minecraft.world.entity.player.PlayerCompat;
 
-import java.util.Objects;
+//#if MC > 12004
+//$$ import com.plusls.carpet.mixin.accessor.AccessorBaseContainerBlockEntity;
+//$$ import net.minecraft.core.component.DataComponents;
+//#endif
 
-//#if MC <= 11802
+//#if MC < 11900
 import org.spongepowered.asm.mixin.Intrinsic;
 //#endif
-//#if MC <= 11701
+
+//#if MC < 11800
 import net.minecraft.nbt.CompoundTag;
 //#endif
 
@@ -38,7 +43,7 @@ public abstract class MixinPotionItem extends Item {
         super(settings);
     }
 
-    //#if MC <= 11802
+    //#if MC < 11900
     @Override
     @Intrinsic
     public @NotNull InteractionResult useOn(UseOnContext useOnContext) {
@@ -46,7 +51,7 @@ public abstract class MixinPotionItem extends Item {
     }
     //#endif
 
-    //#if MC <= 11802
+    //#if MC < 11900
     @SuppressWarnings({"MixinAnnotationTarget", "UnresolvedMixinReference"})
     //#endif
     @Inject(
@@ -64,16 +69,24 @@ public abstract class MixinPotionItem extends Item {
     public void preUseOn(@NotNull UseOnContext useOnContext, CallbackInfoReturnable<InteractionResult> cir) {
         ItemStack itemStack = useOnContext.getItemInHand();
         Player player = useOnContext.getPlayer();
+
         if (!PluslsCarpetAdditionSettings.useDyeOnShulkerBox ||
                 player == null ||
                 itemStack.getItem() != Items.POTION ||
-                PotionUtils.getPotion(itemStack) != Potions.WATER) {
+                //#if MC > 12004
+                //$$ !itemStack.getOrDefault(DataComponents.POTION_CONTENTS, PotionContents.EMPTY).is(Potions.WATER)
+                //#else
+                PotionUtils.getPotion(itemStack) != Potions.WATER
+            //#endif
+        ) {
             return;
         }
+
         Level level = useOnContext.getLevel();
         BlockPos pos = useOnContext.getClickedPos();
         BlockState blockState = level.getBlockState(pos);
         Block block = blockState.getBlock();
+
         if (block instanceof ShulkerBoxBlock &&
                 ((ShulkerBoxBlock) block).getColor() != null) {
             if (!level.isClientSide()) {
@@ -85,24 +98,42 @@ public abstract class MixinPotionItem extends Item {
                     ShulkerBoxBlockEntity newBlockEntity = (ShulkerBoxBlockEntity) level.getBlockEntity(pos);
                     assert blockEntity != null;
                     assert newBlockEntity != null;
-                    //#if MC > 11701
-                    //$$ newBlockEntity.loadFromTag(blockEntity.saveWithoutMetadata());
+                    newBlockEntity.loadFromTag(
+                            //#if MC > 11701
+                            //$$ blockEntity.saveWithoutMetadata(
+                            //#if MC > 12004
+                            //$$         level.registryAccess()
+                            //#endif
+                            //$$ )
+                            //#else
+                            new CompoundTag()
+                            //#endif
+                            //#if MC > 12004
+                            //$$ , level.registryAccess()
+                            //#endif
+                    );
+                    //#if MC > 12004
+                    //$$ ((AccessorBaseContainerBlockEntity) newBlockEntity).pca$setName(blockEntity.getCustomName());
                     //#else
-                    newBlockEntity.loadFromTag(new CompoundTag());
-                    //#endif
                     newBlockEntity.setCustomName(blockEntity.getCustomName());
+                    //#endif
                     newBlockEntity.setChanged();
+
                     if (!player.isCreative()) {
                         useOnContext.getItemInHand().shrink(1);
-                        Objects.requireNonNull(useOnContext.getPlayer()).getInventory().add(new ItemStack(Items.GLASS_BOTTLE));
+                        PlayerCompat playerCompat = PlayerCompat.of(useOnContext.getPlayer());
+                        playerCompat.getInventory().add(new ItemStack(Items.GLASS_BOTTLE));
                     }
                 }
             }
-            //#if MC > 11802
-            //$$ cir.setReturnValue(InteractionResult.sidedSuccess(level.isClientSide));
-            //#else
-            cir.setReturnValue(level.isClientSide ? InteractionResult.SUCCESS : InteractionResult.PASS);
-            //#endif
+
+            cir.setReturnValue(
+                    //#if MC > 11802
+                    //$$ InteractionResult.sidedSuccess(level.isClientSide)
+                    //#else
+                    level.isClientSide ? InteractionResult.SUCCESS : InteractionResult.PASS
+                    //#endif
+            );
         }
     }
 }

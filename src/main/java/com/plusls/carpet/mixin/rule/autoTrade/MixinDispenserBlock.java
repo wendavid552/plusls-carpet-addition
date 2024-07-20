@@ -19,6 +19,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -39,12 +40,16 @@ import net.minecraft.server.level.ServerLevel;
 
 @Mixin(DispenserBlock.class)
 public class MixinDispenserBlock {
+    @Unique
     private static final DefaultDispenseItemBehavior pca$itemDispenserBehavior = new DefaultDispenseItemBehavior();
 
+    @Unique
     private static void pca$depleteItemInInventory(@NotNull ItemStack itemStack, Container container) {
         Item item = itemStack.getItem();
+
         for (int i = 0; !itemStack.isEmpty() && i < container.getContainerSize(); ++i) {
             ItemStack tmpItemStack = container.getItem(i);
+
             if (!tmpItemStack.isEmpty() && tmpItemStack.is(item)) {
                 int count = Math.min(itemStack.getCount(), tmpItemStack.getCount());
                 itemStack.setCount(itemStack.getCount() - count);

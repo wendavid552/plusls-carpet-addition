@@ -1,3 +1,5 @@
+import groovy.json.JsonSlurper
+
 pluginManagement {
     repositories {
         mavenLocal()
@@ -13,16 +15,38 @@ pluginManagement {
             name("Jitpack")
             url("https://jitpack.io")
         }
+    }
 
-        maven {
-            name("Nyan Maven")
-            url("https://maven.hendrixshen.top")
+    resolutionStrategy {
+        eachPlugin {
+            switch (requested.id.id) {
+                case "com.replaymod.preprocess": {
+                    useModule("com.github.Fallen-Breath:preprocessor:${requested.version}")
+                    break
+                }
+            }
+        }
+    }
+}
+
+ext {
+    File localPropsFile = file("${rootDir}/local.properties")
+
+    if (localPropsFile.exists()) {
+        Properties p = new Properties()
+        p.load(new FileInputStream(localPropsFile))
+        p.each { key, value ->
+            ext[key as String] = value
+        }
+    }
+
+    getOrDefault = { String key, String defaultValue ->
+        if (!ext.has(key)) {
+            return defaultValue
         }
 
-        maven {
-            name("Cotton")
-            url("https://server.bbkr.space/artifactory/libs-release")
-        }
+        String value = ext.getProperty(key)
+        return value.isEmpty() ? defaultValue : value
     }
 }
 
@@ -40,11 +64,13 @@ def versions = Arrays.asList(
         "1.20.4",
 )
 
-for (String version : versions) {
-    include(":$version")
-    def proj = project(":$version")
-    proj.projectDir = file("versions/$version")
-    proj.buildFileName = "../../common.gradle"
+Map<String, List<String>> settings = file("settings.json").withReader {
+    new JsonSlurper().parse(it) as Map<String, List<String>>
 }
 
-include(":fabricWrapper")
+for (String version : settings.get("versions")) {
+    include(":$version")
+    ProjectDescriptor proj = project(":$version")
+    proj.setProjectDir(file("versions/$version"))
+    proj.setBuildFileName("../${settings.versions.get(0)}/build.gradle")
+}

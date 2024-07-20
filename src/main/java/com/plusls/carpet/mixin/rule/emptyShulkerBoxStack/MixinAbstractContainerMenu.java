@@ -7,6 +7,10 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
+//#if MC > 12004
+//$$ import net.minecraft.world.inventory.Slot;
+//#endif
+
 @Mixin(AbstractContainerMenu.class)
 public class MixinAbstractContainerMenu {
     @Redirect(
@@ -25,11 +29,19 @@ public class MixinAbstractContainerMenu {
             method = "moveItemStackTo",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/world/item/ItemStack;getMaxStackSize()I",
-                    ordinal = -1
+                    //#if MC > 12004
+                    //$$ target = "Lnet/minecraft/world/inventory/Slot;getMaxStackSize(Lnet/minecraft/world/item/ItemStack;)I"
+                    //#else
+                    target = "Lnet/minecraft/world/item/ItemStack;getMaxStackSize()I"
+                    //#endif
             )
     )
-    private int insertItemGetMaxCount0(ItemStack itemStack) {
+    private int insertItemGetMaxCount0(
+            //#if MC > 12004
+            //$$ Slot instance,
+            //#endif
+            ItemStack itemStack
+    ) {
         return ShulkerBoxItemUtil.getMaxCount(itemStack);
     }
 
