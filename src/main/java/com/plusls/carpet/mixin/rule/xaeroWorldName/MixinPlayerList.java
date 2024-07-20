@@ -38,7 +38,9 @@ public class MixinPlayerList {
         buf.writeByte(0);
         buf.writeInt((int) crc.getValue());
 
-        // ServerPlayNetworking.send(player, xaeroworldmap, new FriendlyByteBuf(buf.duplicate()));
-        // ServerPlayNetworking.send(player, xaerominimap, new FriendlyByteBuf(buf.duplicate()));
+        //#if MC < 12005
+        ServerPlayNetworking.send(player, xaeroworldmap, new FriendlyByteBuf(buf.duplicate()));
+        ServerPlayNetworking.send(player, xaerominimap, new FriendlyByteBuf(buf.duplicate()));
+        //#endif
     }
 }

@@ -228,14 +228,14 @@ public class PluslsCarpetAdditionSettings {
     )
     public static boolean villagersAttractedByEmeraldBlock = false;
 
-    // @Rule(
-    //         categories = {
-    //                 PROTOCOL
-    //         },
-    //         strict = false,
-    //         options = {
-    //                 xaeroWorldNameNone
-    //         }
-    // )
-    // public static String xaeroWorldName = xaeroWorldNameNone;
+    @Rule(
+            categories = {
+                    PROTOCOL
+            },
+            strict = false,
+            options = {
+                    xaeroWorldNameNone
+            }
+    )
+    public static String xaeroWorldName = xaeroWorldNameNone;
 }

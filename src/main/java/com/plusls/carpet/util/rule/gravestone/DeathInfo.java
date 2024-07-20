@@ -33,7 +33,7 @@ public class DeathInfo {
             //#if MC > 11502
             SimpleContainer inv
             //#else
-            //$$ Lists<ItemStack> inv
+            //$$ List<ItemStack> inv
             //#endif
     ) {
         this.deathTime = deathTime;
@@ -106,7 +106,7 @@ public class DeathInfo {
     //$$
     //$$     for (ItemStack itemStack : inventory) {
     //$$         if (!itemStack.isEmpty()) {
-    //$$             listTag.add(itemStack.save(new CompoundTag()));
+    //$$             ret.add(itemStack.save(new CompoundTag()));
     //$$         }
     //$$     }
     //$$

@@ -1,13 +1,9 @@
 package com.plusls.carpet.mixin.rule.avoidAnvilTooExpensive;
 
 import com.plusls.carpet.PluslsCarpetAdditionSettings;
-import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AnvilMenu;
-import net.minecraft.world.inventory.ContainerLevelAccess;
-import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.ItemStack;
 import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -19,7 +15,11 @@ import org.spongepowered.asm.mixin.injection.Slice;
 //#endif
 
 //#if MC > 11502
+import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.ItemCombinerMenu;
+import net.minecraft.world.inventory.ContainerLevelAccess;
+import net.minecraft.world.inventory.MenuType;
+import org.jetbrains.annotations.Nullable;
 //#else
 //$$ import net.minecraft.world.Container;
 //$$ import org.spongepowered.asm.mixin.Final;
@@ -31,8 +31,22 @@ public abstract class MixinAnvilMenu
         extends ItemCombinerMenu
         //#endif
 {
-    private MixinAnvilMenu(@Nullable MenuType<?> type, int containerId, Inventory playerInventory, ContainerLevelAccess access) {
-        super(type, containerId, playerInventory, access);
+    private MixinAnvilMenu(
+            //#if MC > 11502
+            @Nullable MenuType<?> type,
+            int containerId,
+            Inventory playerInventory,
+            ContainerLevelAccess access
+            //#endif
+    ) {
+        super(
+                //#if MC > 11502
+                type,
+                containerId,
+                playerInventory,
+                access
+                //#endif
+        );
     }
 
     @Shadow

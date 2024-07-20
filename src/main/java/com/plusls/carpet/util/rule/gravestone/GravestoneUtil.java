@@ -19,6 +19,10 @@ import net.minecraft.world.level.block.entity.SkullBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import top.hendrixshen.magiclib.api.compat.minecraft.world.entity.player.PlayerCompat;
+import top.hendrixshen.magiclib.api.compat.minecraft.world.item.ItemStackCompat;
+import top.hendrixshen.magiclib.api.compat.minecraft.world.level.LevelCompat;
+import top.hendrixshen.magiclib.impl.compat.minecraft.world.level.dimension.DimensionWrapper;
 
 import java.util.Objects;
 
@@ -28,10 +32,6 @@ import java.util.Objects;
 
 //#if MC > 11502
 import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
-import top.hendrixshen.magiclib.api.compat.minecraft.world.entity.player.PlayerCompat;
-import top.hendrixshen.magiclib.api.compat.minecraft.world.item.ItemStackCompat;
-import top.hendrixshen.magiclib.api.compat.minecraft.world.level.LevelCompat;
-import top.hendrixshen.magiclib.impl.compat.minecraft.world.level.dimension.DimensionWrapper;
 //#else
 //$$ import com.google.common.collect.Lists;
 //$$ import net.minecraft.world.level.dimension.DimensionType;

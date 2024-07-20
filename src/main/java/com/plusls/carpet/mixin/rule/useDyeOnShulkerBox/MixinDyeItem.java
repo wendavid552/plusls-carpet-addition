@@ -101,7 +101,7 @@ public abstract class MixinDyeItem extends Item {
                 //#if MC > 11502
                 InteractionResult.sidedSuccess(level.isClientSide)
                 //#else
-                //$$ cir.setReturnValue(level.isClientSide ? InteractionResult.SUCCESS : InteractionResult.PASS);
+                //$$ level.isClientSide ? InteractionResult.SUCCESS : InteractionResult.PASS
                 //#endif
         );
     }
