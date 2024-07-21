@@ -11,9 +11,7 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.core.config.Configurator;
 import top.hendrixshen.magiclib.carpet.api.CarpetExtensionCompatApi;
 import top.hendrixshen.magiclib.carpet.impl.WrappedSettingManager;
-import top.hendrixshen.magiclib.util.MiscUtil;
 
-@SuppressWarnings("removal")
 public class PluslsCarpetAdditionExtension implements CarpetExtensionCompatApi {
     @Getter
     private static final PluslsCarpetAdditionSettingManager settingsManager = new PluslsCarpetAdditionSettingManager(
@@ -34,20 +32,6 @@ public class PluslsCarpetAdditionExtension implements CarpetExtensionCompatApi {
 
     @Override
     public void onGameStarted() {
-        PluslsCarpetAdditionExtension.settingsManager.parseSettingsClass(PluslsCarpetAdditionSettings.class);
-        PluslsCarpetAdditionExtension.settingsManager.registerRuleCallback((source, rule, value) -> {
-            if (rule.getName().equals("pcaSyncProtocol")) {
-                if (rule.getRule().getBoolValue()) {
-                    PcaSyncProtocol.enablePcaSyncProtocolGlobal();
-                } else {
-                    PcaSyncProtocol.disablePcaSyncProtocolGlobal();
-                }
-            } else if (rule.getName().equals("pcaDebug")) {
-                Configurator.setLevel(PluslsCarpetAdditionReference.getModIdentifier(), MiscUtil.cast(rule.getValue()) ? Level.DEBUG : Level.INFO);
-            }
-        });
-        PcaSyncProtocol.init();
-        FlipCooldown.init();
         if (PluslsCarpetAdditionSettings.pcaDebug) {
             PluslsCarpetAdditionReference.getLogger().getName();
             Configurator.setLevel(PluslsCarpetAdditionReference.getModIdentifier(), Level.DEBUG);
