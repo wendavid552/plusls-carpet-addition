@@ -23,6 +23,9 @@
   "entrypoints": {
     "main": [
       "com.plusls.carpet.PluslsCarpetAddition"
+    ],
+    "server": [
+      "com.plusls.carpet.PluslsCarpetAddition"
     ]
   },
   "mixins": [
