@@ -33,6 +33,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import top.hendrixshen.magiclib.api.compat.minecraft.world.entity.player.PlayerCompat;
+import top.hendrixshen.magiclib.api.compat.minecraft.world.level.state.BlockStateCompat;
 import top.hendrixshen.magiclib.impl.compat.minecraft.world.level.dimension.DimensionWrapper;
 
 import java.util.HashMap;
@@ -139,7 +140,7 @@ public class PcaSyncProtocol {
     // 传输 World 是为了通知客户端该 Entity 属于哪个 World
     public static void updateEntity(@NotNull ServerPlayer player, @NotNull Entity entity) {
         FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
-        buf.writeResourceLocation(DimensionWrapper.of(PlayerCompat.of(player).getLevel().get()).getResourceLocation());
+        buf.writeResourceLocation(DimensionWrapper.of(PlayerCompat.of(player).getLevel()).getResourceLocation());
         buf.writeInt(entity.getId());
         buf.writeNbt(entity.saveWithoutId(new CompoundTag()));
         ServerPlayNetworking.send(
@@ -277,12 +278,13 @@ public class PcaSyncProtocol {
         BlockPos pos = buf.readBlockPos();
         //#endif
 
-        ServerLevel level = (ServerLevel) PlayerCompat.of(player).getLevel().get();
+        ServerLevel level = (ServerLevel) PlayerCompat.of(player).getLevel();
         BlockState blockState = level.getBlockState(pos);
+        BlockStateCompat blockStateCompat = BlockStateCompat.of(blockState);
         clearPlayerWatchData(player);
         PluslsCarpetAdditionReference.getLogger().debug("{} watch blockpos {}: {}", player.getName().getString(), pos, blockState);
-
         BlockEntity blockEntityAdj = null;
+
         // 不是单个箱子则需要更新隔壁箱子
         if (blockState.getBlock() instanceof ChestBlock) {
             if (blockState.getValue(ChestBlock.TYPE) != ChestType.SINGLE) {
@@ -290,12 +292,13 @@ public class PcaSyncProtocol {
                 // The method in World now checks that the caller is from the same thread...
                 blockEntityAdj = level.getChunkAt(posAdj).getBlockEntity(posAdj);
             }
-        } else if (PluslsCarpetAdditionReference.tisCarpetLoaded && blockState.is(Blocks.BARREL) && CarpetServer.settingsManager.getRule("largeBarrel").getBoolValue()) {
+        } else if (PluslsCarpetAdditionReference.tisCarpetLoaded && blockStateCompat.is(Blocks.BARREL) && CarpetServer.settingsManager.getRule("largeBarrel").getBoolValue()) {
             Direction directionOpposite = blockState.getValue(BarrelBlock.FACING).getOpposite();
             BlockPos posAdj = pos.relative(directionOpposite);
             BlockState blockStateAdj = level.getBlockState(posAdj);
+            BlockStateCompat blockStateCompatAdj = BlockStateCompat.of(blockStateAdj);
 
-            if (blockStateAdj.is(Blocks.BARREL) && blockStateAdj.getValue(BarrelBlock.FACING) == directionOpposite) {
+            if (blockStateCompatAdj.is(Blocks.BARREL) && blockStateAdj.getValue(BarrelBlock.FACING) == directionOpposite) {
                 blockEntityAdj = level.getChunkAt(posAdj).getBlockEntity(posAdj);
             }
         }
@@ -352,7 +355,7 @@ public class PcaSyncProtocol {
         int entityId = buf.readInt();
         //#endif
 
-        ServerLevel level = (ServerLevel) PlayerCompat.of(player).getLevel().get();
+        ServerLevel level = (ServerLevel) PlayerCompat.of(player).getLevel();
         Entity entity = level.getEntity(entityId);
 
         if (entity == null) {
@@ -456,6 +459,7 @@ public class PcaSyncProtocol {
             }
 
             BlockState blockState = world.getBlockState(pos);
+            BlockStateCompat blockStateCompat = BlockStateCompat.of(blockState);
             lock.lock();
             Set<ServerPlayer> playerList = getWatchPlayerList(world, blockEntity.getBlockPos());
             Set<ServerPlayer> playerListAdj = null;
@@ -467,11 +471,13 @@ public class PcaSyncProtocol {
                     BlockPos posAdj = pos.relative(ChestBlock.getConnectedDirection(blockState));
                     playerListAdj = getWatchPlayerList(world, posAdj);
                 }
-            } else if (PluslsCarpetAdditionReference.tisCarpetLoaded && blockState.is(Blocks.BARREL) && CarpetServer.settingsManager.getRule("largeBarrel").getBoolValue()) {
+            } else if (PluslsCarpetAdditionReference.tisCarpetLoaded && blockStateCompat.is(Blocks.BARREL) && CarpetServer.settingsManager.getRule("largeBarrel").getBoolValue()) {
                 Direction directionOpposite = blockState.getValue(BarrelBlock.FACING).getOpposite();
                 BlockPos posAdj = pos.relative(directionOpposite);
                 BlockState blockStateAdj = world.getBlockState(posAdj);
-                if (blockStateAdj.is(Blocks.BARREL) && blockStateAdj.getValue(BarrelBlock.FACING) == directionOpposite) {
+                BlockStateCompat blockStateCompatAdj = BlockStateCompat.of(blockStateAdj);
+
+                if (blockStateCompatAdj.is(Blocks.BARREL) && blockStateAdj.getValue(BarrelBlock.FACING) == directionOpposite) {
                     playerListAdj = getWatchPlayerList(world, posAdj);
                 }
             }

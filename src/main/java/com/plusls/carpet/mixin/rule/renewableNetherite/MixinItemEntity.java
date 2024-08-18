@@ -39,11 +39,11 @@ public abstract class MixinItemEntity extends Entity {
     private void checkDiamondEquip(DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
         EntityCompat entityCompat = EntityCompat.of(this);
 
-        if (!PluslsCarpetAdditionSettings.renewableNetheriteEquip || entityCompat.getLevel().get().isClientSide) {
+        if (!PluslsCarpetAdditionSettings.renewableNetheriteEquip || entityCompat.getLevel().isClientSide()) {
             return;
         }
 
-        ServerLevel serverLevel = (ServerLevel) entityCompat.getLevel().get();
+        ServerLevel serverLevel = (ServerLevel) entityCompat.getLevel();
 
         if (
                 //#if MC > 11903

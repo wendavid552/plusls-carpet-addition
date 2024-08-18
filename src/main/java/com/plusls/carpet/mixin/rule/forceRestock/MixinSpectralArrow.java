@@ -6,25 +6,35 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.npc.AbstractVillager;
 import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.entity.projectile.SpectralArrow;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.trading.MerchantOffer;
 import net.minecraft.world.level.Level;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import top.hendrixshen.magiclib.api.compat.minecraft.world.entity.EntityCompat;
+
+//#if 12006 > MC && MC > 12002
+//$$ import net.minecraft.world.item.ItemStack;
+//#endif
 
 @Mixin(SpectralArrow.class)
 public abstract class MixinSpectralArrow extends AbstractArrow {
-    //#if MC <= 12002
-    protected MixinSpectralArrow(EntityType<? extends AbstractArrow> entityType, Level world) {
-        super(entityType, world);
+    private MixinSpectralArrow(
+            EntityType<? extends AbstractArrow> entityType,
+            Level world
+            //#if 12006 > MC && MC > 12002
+            //$$ , ItemStack itemStack
+            //#endif
+    ) {
+        super(
+                entityType,
+                world
+                //#if 12006 > MC && MC > 12002
+                //$$ , itemStack
+                //#endif
+        );
     }
-    //#else
-    //$$ protected MixinSpectralArrow(EntityType<? extends AbstractArrow> entityType, Level world, ItemStack item) {
-    //$$     super(entityType, world, item);
-    //$$ }
-    //#endif
 
     @Inject(
             method = "doPostHurtEffects",
@@ -33,13 +43,17 @@ public abstract class MixinSpectralArrow extends AbstractArrow {
             )
     )
     private void forceRestock(LivingEntity target, CallbackInfo ci) {
-        if (PluslsCarpetAdditionSettings.forceRestock && !target.getLevelCompat().isClientSide && target instanceof AbstractVillager) {
+        Level levelCompat = EntityCompat.of(target).getLevel();
+
+        if (PluslsCarpetAdditionSettings.forceRestock && !levelCompat.isClientSide && target instanceof AbstractVillager) {
             AbstractVillager villager = (AbstractVillager) target;
+
             for (MerchantOffer tradeOffer : villager.getOffers()) {
                 tradeOffer.resetUses();
             }
+
             // make villager happy ~
-            this.getLevelCompat().broadcastEntityEvent(villager, (byte) 14);
+            levelCompat.broadcastEntityEvent(villager, (byte) 14);
         }
     }
 }

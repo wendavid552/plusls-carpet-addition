@@ -1,8 +1,6 @@
 package com.plusls.carpet.mixin.rule.trackItemPickupByPlayer;
 
-import com.plusls.carpet.PluslsCarpetAdditionExtension;
 import com.plusls.carpet.PluslsCarpetAdditionSettings;
-import com.plusls.carpet.util.StringUtil;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -12,15 +10,19 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import top.hendrixshen.magiclib.compat.minecraft.api.network.chat.ComponentCompatApi;
-import top.hendrixshen.magiclib.util.MessageUtil;
+import top.hendrixshen.magiclib.api.compat.minecraft.network.chat.ComponentCompat;
+import top.hendrixshen.magiclib.api.compat.minecraft.world.entity.EntityCompat;
+import top.hendrixshen.magiclib.util.minecraft.MessageUtil;
 
 @Mixin(ItemEntity.class)
 public abstract class MixinItemEntity extends Entity {
-    private boolean pca$pickuped = false;
+    @Unique
+    private boolean pca$pickup = false;
+    @Unique
     private int pca$trackItemPickupByPlayerCooldown = 0;
 
     public MixinItemEntity(EntityType<?> type, Level level) {
@@ -35,13 +37,11 @@ public abstract class MixinItemEntity extends Entity {
 
     @Inject(
             method = "tick",
-            at = @At(
-                    value = "HEAD"
-            ),
+            at = @At("HEAD"),
             cancellable = true
     )
     private void prevTick(CallbackInfo ci) {
-        if (!this.getLevelCompat().isClientSide() && PluslsCarpetAdditionSettings.trackItemPickupByPlayer && pca$pickuped) {
+        if (!EntityCompat.of(this).getLevel().isClientSide() && PluslsCarpetAdditionSettings.trackItemPickupByPlayer && pca$pickup) {
             ci.cancel();
         }
     }
@@ -56,20 +56,29 @@ public abstract class MixinItemEntity extends Entity {
             cancellable = true
     )
     private void checkPickup(Player player, CallbackInfo ci) {
-        if (!this.getLevelCompat().isClientSide() && PluslsCarpetAdditionSettings.trackItemPickupByPlayer && PluslsCarpetAdditionExtension.getServer() != null) {
-            if (pca$trackItemPickupByPlayerCooldown == 0) {
-                MessageUtil.sendServerMessage(PluslsCarpetAdditionExtension.getServer(),
-                        ComponentCompatApi.literal(StringUtil.tr("pca.message.pickup", player.getName().getString(),
-                                this.getX(), this.getY(), this.getZ(),
-                                this.getDeltaMovement().x(), this.getDeltaMovement().y(), this.getDeltaMovement().z())));
-            }
-            pca$trackItemPickupByPlayerCooldown = (pca$trackItemPickupByPlayerCooldown + 1) % 100;
-            pca$pickuped = true;
-            this.setItem(new ItemStack(Items.BARRIER));
-            this.setNoGravity(true);
-            this.noPhysics = true;
-            this.setDeltaMovement(0, 0, 0);
-            ci.cancel();
+        if (!PluslsCarpetAdditionSettings.trackItemPickupByPlayer) {
+            return;
         }
+
+        EntityCompat entityCompat = EntityCompat.of(this);
+
+        if (!entityCompat.getLevel().isClientSide()) {
+            return;
+        }
+
+        if (pca$trackItemPickupByPlayerCooldown == 0) {
+            MessageUtil.sendServerMessage(ComponentCompat.translatable("pca.message.pickup",
+                    player.getName().getString(),
+                    entityCompat.getX(), entityCompat.getY(), entityCompat.getZ(),
+                    this.getDeltaMovement().x(), this.getDeltaMovement().y(), this.getDeltaMovement().z()));
+        }
+
+        pca$trackItemPickupByPlayerCooldown = (pca$trackItemPickupByPlayerCooldown + 1) % 100;
+        pca$pickup = true;
+        this.setItem(new ItemStack(Items.BARRIER));
+        this.setNoGravity(true);
+        this.noPhysics = true;
+        this.setDeltaMovement(0, 0, 0);
+        ci.cancel();
     }
 }

@@ -13,12 +13,15 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import top.hendrixshen.magiclib.api.compat.minecraft.world.entity.player.PlayerCompat;
 
 @Mixin(BlockRotator.class)
 public class MixinBlockRotator {
+    @Unique
     private static boolean pca$playerHoldsTotemOfUndyingMainHand(@NotNull Player player) {
         return player.getMainHandItem().getItem() == Items.TOTEM_OF_UNDYING;
     }
@@ -37,11 +40,12 @@ public class MixinBlockRotator {
         if (!cir.getReturnValue() && PluslsCarpetAdditionSettings.flippingTotemOfUndying &&
                 level.getGameTime() != FlipCooldown.getCoolDown(player)) {
             // 能修改世界且副手为空
-            if (!player.getAbilitiesCompat().mayBuild ||
+            if (!PlayerCompat.of(player).getAbilities().mayBuild ||
                     !pca$playerHoldsTotemOfUndyingMainHand(player) ||
                     !player.getOffhandItem().isEmpty()) {
                 return;
             }
+
             //#if MC > 11502
             CarpetSettings.impendingFillSkipUpdates.set(true);
             //#else
@@ -53,9 +57,11 @@ public class MixinBlockRotator {
             //#else
             //$$ CarpetSettings.impendingFillSkipUpdates = false;
             //#endif
+
             if (ret) {
                 FlipCooldown.setCoolDown(player, level.getGameTime());
             }
+
             cir.setReturnValue(ret);
         }
     }

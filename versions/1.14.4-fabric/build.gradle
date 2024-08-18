@@ -63,7 +63,12 @@ dependencies {
 
 loom {
     accessWidenerPath.set(file("${project.property("mod.id")}.accesswidener"))
-    enableTransitiveAccessWideners.set(true)
+    enableTransitiveAccessWideners.set(false)
+
+    interfaceInjection {
+        enableDependencyInterfaceInjection.set(false)
+        isEnabled.set(false)
+    }
 
     runConfigs.configureEach {
         // Dump modified classes automatically.

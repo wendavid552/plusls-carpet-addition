@@ -10,13 +10,17 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.Level;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import top.hendrixshen.magiclib.api.compat.minecraft.world.entity.EntityCompat;
 
 @Mixin(Villager.class)
 public abstract class MixinVillager extends AbstractVillager {
+    @Unique
     boolean pca$VillagersAttractedByEmeraldBlock;
+    @Unique
     private TemptGoal pca$villagersAttractedByEmeraldBlockGoal;
 
     public MixinVillager(EntityType<? extends AbstractVillager> entityType, Level world) {
@@ -30,9 +34,10 @@ public abstract class MixinVillager extends AbstractVillager {
             )
     )
     private void init(EntityType<? extends Villager> entityType, Level world, VillagerType type, CallbackInfo ci) {
-        if (this.getLevelCompat().isClientSide()) {
+        if (EntityCompat.of(this).getLevel().isClientSide()) {
             return;
         }
+
         this.pca$villagersAttractedByEmeraldBlockGoal = new TemptGoal(this, 1.0D, Ingredient.of(Items.EMERALD_BLOCK), false);
     }
 
@@ -43,9 +48,10 @@ public abstract class MixinVillager extends AbstractVillager {
             )
     )
     private void checkVillagersAttractedByEmeraldBlock(CallbackInfo ci) {
-        if (this.getLevelCompat().isClientSide()) {
+        if (EntityCompat.of(this).getLevel().isClientSide()) {
             return;
         }
+
         if (!this.pca$VillagersAttractedByEmeraldBlock && PluslsCarpetAdditionSettings.villagersAttractedByEmeraldBlock) {
             if (!this.pca$villagersAttractedByEmeraldBlockGoal.canUse()) {
                 this.pca$villagersAttractedByEmeraldBlockGoal = new TemptGoal(this, 1.0D, Ingredient.of(Items.EMERALD_BLOCK), false);

@@ -16,36 +16,45 @@ import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import top.hendrixshen.magiclib.api.compat.minecraft.world.entity.player.PlayerCompat;
 import top.hendrixshen.magiclib.util.MessageUtil;
 
-//#if MC > 11802 && MC < 11903
+//#if 11903 > MC && MC > 11802
 //$$ import net.minecraft.world.entity.player.ProfilePublicKey;
 //$$ import org.jetbrains.annotations.Nullable;
 //#endif
 
 @Mixin(ServerPlayer.class)
 public abstract class MixinServerPlayer extends Player {
-    //#if MC > 11902
-    //$$ public MixinServerPlayer(Level level, BlockPos blockPos, float f, GameProfile gameProfile) {
-    //$$     super(level, blockPos, f, gameProfile);
-    //$$ }
-    //#elseif MC > 11802
-    //$$ public MixinServerPlayer(Level level, BlockPos blockPos, float f, GameProfile gameProfile, @Nullable ProfilePublicKey profilePublicKey) {
-    //$$     super(level, blockPos, f, gameProfile, profilePublicKey);
-    //$$ }
-    //#elseif MC > 11502
-    public MixinServerPlayer(Level level, BlockPos blockPos, float f, GameProfile gameProfile) {
-        super(level, blockPos, f, gameProfile);
+    private MixinServerPlayer(
+            Level level,
+            //#if MC > 11502
+            BlockPos blockPos,
+            float f,
+            //#endif
+            GameProfile gameProfile
+            //#if 11903 > MC && MC > 11802
+            //$$ , @Nullable ProfilePublicKey profilePublicKey
+            //#endif
+    ) {
+        super(
+                level,
+                //#if MC > 11502
+                blockPos,
+                f,
+                //#endif
+                gameProfile
+                //#if 11903 > MC && MC > 11802
+                //$$ , profilePublicKey
+                //#endif
+        );
     }
-    //#else
-    //$$ public MixinServerPlayer(Level level, GameProfile gameProfile) {
-    //$$     super(level, gameProfile);
-    //$$ }
-    //#endif
 
     @Shadow
     public ServerGamePacketListenerImpl connection;
-    @Shadow @Final public MinecraftServer server;
+    @Shadow
+    @Final
+    public MinecraftServer server;
     @Unique
     private int pca$sneakTimes = 0;
     @Unique
@@ -77,6 +86,7 @@ public abstract class MixinServerPlayer extends Player {
 
         if (sneaking) {
             long nowTime = Util.getMillis();
+            PlayerCompat playerCompat = PlayerCompat.of(this);
 
             // Every sneak interval must not be over 0.2s
             if (nowTime - this.pca$lastSneakTime > 200) {
@@ -86,16 +96,16 @@ public abstract class MixinServerPlayer extends Player {
                 ci.cancel();
             }
 
-            if (this.isOnGround()) {
+            if (playerCompat.isOnGround()) {
                 this.pca$sneakTimes++;
             }
 
             this.pca$lastSneakTime = nowTime;
 
             if (this.pca$sneakTimes > 2) {
-                ArmorStand armorStandEntity = new ArmorStand(this.getLevelCompat(), this.getX(), this.getY() - 0.16, this.getZ());
+                ArmorStand armorStandEntity = new ArmorStand(playerCompat.getLevel(), playerCompat.getX(), playerCompat.getY() - 0.16, playerCompat.getZ());
                 ((SitEntity) armorStandEntity).pca$setSitEntity(true);
-                this.getLevelCompat().addFreshEntity(armorStandEntity);
+                playerCompat.getLevel().addFreshEntity(armorStandEntity);
                 this.setShiftKeyDown(false);
 
                 if (this.connection != null) {

@@ -35,10 +35,21 @@ public class GlassBottleDispenserBehavior extends MyFallibleItemDispenserBehavio
 
     private ItemStack replaceItem(BlockSource pointer, ItemStack oldItem, ItemStack newItem) {
         oldItem.shrink(1);
-        if (oldItem.isEmpty())
+
+        if (oldItem.isEmpty()) {
             return newItem.copy();
-        if (((DispenserBlockEntity) pointer.getEntity()).addItem(newItem.copy()) < 0)
+        }
+
+        if (
+                //#if MC > 12006
+                //$$ !pointer.blockEntity().insertItem(newItem.copy()).isEmpty()
+                //#else
+                ((DispenserBlockEntity) pointer.getEntity()).addItem(newItem.copy()) < 0
+                //#endif
+        ) {
             this.fallbackBehavior.dispense(pointer, newItem.copy());
+        }
+
         return oldItem;
     }
 

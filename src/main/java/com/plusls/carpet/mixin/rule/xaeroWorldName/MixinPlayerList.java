@@ -13,6 +13,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import top.hendrixshen.magiclib.api.compat.minecraft.resources.ResourceLocationCompat;
 
 import java.nio.charset.StandardCharsets;
 import java.util.zip.CRC32;
@@ -28,8 +29,9 @@ public class MixinPlayerList {
         if (PluslsCarpetAdditionSettings.xaeroWorldName.equals(PluslsCarpetAdditionSettings.xaeroWorldNameNone)) {
             return;
         }
-        ResourceLocation xaeroworldmap = new ResourceLocation("xaeroworldmap", "main");
-        ResourceLocation xaerominimap = new ResourceLocation("xaerominimap", "main");
+
+        ResourceLocation xaeroworldmap = ResourceLocationCompat.fromNamespaceAndPath("xaeroworldmap", "main");
+        ResourceLocation xaerominimap = ResourceLocationCompat.fromNamespaceAndPath("xaerominimap", "main");
 
         CRC32 crc = new CRC32();
         byte[] bytes = PluslsCarpetAdditionSettings.xaeroWorldName.getBytes(StandardCharsets.UTF_8);

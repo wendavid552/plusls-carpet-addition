@@ -19,6 +19,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import top.hendrixshen.magiclib.api.compat.minecraft.world.level.state.BlockStateCompat;
 
 //#if MC > 12004
 //$$ import com.plusls.carpet.mixin.accessor.AccessorBaseContainerBlockEntity;
@@ -59,8 +60,9 @@ public abstract class MixinDyeItem extends Item {
         Level level = context.getLevel();
         BlockPos pos = context.getClickedPos();
         BlockState blockState = level.getBlockState(pos);
+        BlockStateCompat blockStateCompat = BlockStateCompat.of(blockState);
 
-        if (blockState.is(Blocks.SHULKER_BOX)) {
+        if (blockStateCompat.is(Blocks.SHULKER_BOX)) {
             return;
         }
 

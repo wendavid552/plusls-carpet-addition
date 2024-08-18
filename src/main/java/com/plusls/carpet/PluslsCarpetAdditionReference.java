@@ -13,6 +13,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import top.hendrixshen.magiclib.api.compat.minecraft.resources.ResourceLocationCompat;
 import top.hendrixshen.magiclib.util.FabricUtil;
 
 public class PluslsCarpetAdditionReference {
@@ -28,6 +29,6 @@ public class PluslsCarpetAdditionReference {
 
     @Contract(value = "_ -> new", pure = true)
     public static @NotNull ResourceLocation identifier(String path) {
-        return new ResourceLocation(PluslsCarpetAdditionReference.modIdentifier, path);
+        return ResourceLocationCompat.fromNamespaceAndPath(PluslsCarpetAdditionReference.modIdentifier, path);
     }
 }

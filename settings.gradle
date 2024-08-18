@@ -3,18 +3,19 @@ import groovy.json.JsonSlurper
 pluginManagement {
     repositories {
         mavenLocal()
-        mavenCentral()
-        gradlePluginPortal()
 
         maven {
-            name("Fabric")
-            url("https://maven.fabricmc.net")
+            name("NyanMaven Mirror")
+            url("https://maven.hendrixshen.top/mirror")
         }
 
         maven {
             name("Jitpack")
             url("https://jitpack.io")
         }
+
+        mavenCentral()
+        gradlePluginPortal()
     }
 
     resolutionStrategy {

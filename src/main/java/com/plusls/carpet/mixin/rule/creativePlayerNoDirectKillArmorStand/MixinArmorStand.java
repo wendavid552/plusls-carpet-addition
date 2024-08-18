@@ -9,6 +9,7 @@ import net.minecraft.world.level.Level;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
+import top.hendrixshen.magiclib.api.compat.minecraft.world.entity.EntityCompat;
 
 @Mixin(ArmorStand.class)
 public abstract class MixinArmorStand extends LivingEntity {
@@ -25,9 +26,10 @@ public abstract class MixinArmorStand extends LivingEntity {
             )
     )
     private boolean redirectIsSourceCreativePlayer(DamageSource instance) {
-        if (!this.getLevelCompat().isClientSide() && PluslsCarpetAdditionSettings.creativePlayerNoDirectKillArmorStand) {
+        if (!EntityCompat.of(this).getLevel().isClientSide() && PluslsCarpetAdditionSettings.creativePlayerNoDirectKillArmorStand) {
             return false;
         }
+
         return instance.isCreativePlayer();
     }
 }

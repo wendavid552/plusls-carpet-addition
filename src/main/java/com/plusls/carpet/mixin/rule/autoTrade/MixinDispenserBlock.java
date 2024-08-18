@@ -23,6 +23,8 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import top.hendrixshen.magiclib.api.compat.minecraft.world.item.ItemStackCompat;
+import top.hendrixshen.magiclib.api.compat.minecraft.world.level.state.BlockStateCompat;
 
 import java.util.List;
 
@@ -48,31 +50,39 @@ public class MixinDispenserBlock {
         Item item = itemStack.getItem();
 
         for (int i = 0; !itemStack.isEmpty() && i < container.getContainerSize(); ++i) {
-            ItemStack tmpItemStack = container.getItem(i);
+            ItemStack stack = container.getItem(i);
+            ItemStackCompat stackCompat = ItemStackCompat.of(stack);
 
-            if (!tmpItemStack.isEmpty() && tmpItemStack.is(item)) {
-                int count = Math.min(itemStack.getCount(), tmpItemStack.getCount());
+            if (!stack.isEmpty() && stackCompat.is(item)) {
+                int count = Math.min(itemStack.getCount(), stack.getCount());
                 itemStack.setCount(itemStack.getCount() - count);
-                tmpItemStack.setCount(tmpItemStack.getCount() - count);
+                stack.setCount(stack.getCount() - count);
             }
         }
     }
 
+    @Unique
     private static ItemStack pca$getItemFromInventory(@NotNull ItemStack itemStack, Container container) {
         if (itemStack.isEmpty()) {
             return ItemStack.EMPTY;
         }
+
         Item item = itemStack.getItem();
         ItemStack ret = new ItemStack(item, 0);
+
         for (int i = 0; i < container.getContainerSize(); ++i) {
-            ItemStack tmpStack = container.getItem(i);
-            if (!tmpStack.isEmpty() && tmpStack.is(item)) {
-                ret.setCount(Math.min(tmpStack.getCount() + ret.getCount(), ret.getMaxStackSize()));
+            ItemStack stack = container.getItem(i);
+            ItemStackCompat stackCompat = ItemStackCompat.of(stack);
+
+            if (!stack.isEmpty() && stackCompat.is(item)) {
+                ret.setCount(Math.min(stack.getCount() + ret.getCount(), ret.getMaxStackSize()));
+
                 if (ret.getCount() == ret.getMaxStackSize()) {
                     break;
                 }
             }
         }
+
         return ret;
     }
 
@@ -92,41 +102,51 @@ public class MixinDispenserBlock {
         if (!PluslsCarpetAdditionSettings.autoTrade) {
             return;
         }
+
         BlockState state = level.getBlockState(blockPos.below());
+        BlockStateCompat blockStateCompat = BlockStateCompat.of(state);
         boolean tradeAll;
-        if (state.is(Blocks.EMERALD_BLOCK)) {
+
+        if (blockStateCompat.is(Blocks.EMERALD_BLOCK)) {
             tradeAll = false;
-        } else if (state.is(Blocks.DIAMOND_BLOCK)) {
+        } else if (blockStateCompat.is(Blocks.DIAMOND_BLOCK)) {
             tradeAll = true;
         } else {
             return;
         }
+
         BlockPos faceBlockPos = blockPos.relative(level.getBlockState(blockPos).getValue(DispenserBlock.FACING));
         List<AbstractVillager> villagerList = level.getEntitiesOfClass(AbstractVillager.class,
                 new AABB(faceBlockPos), Entity::isAlive);
+
         if (villagerList.isEmpty()) {
             return;
         }
+
         AbstractVillager merchantEntity = villagerList.get(0);
         MerchantOffers offerList = merchantEntity.getOffers();
+
         if (offerList.isEmpty()) {
             return;
         }
 
         int tradeId = level.getBestNeighborSignal(blockPos);
+
         if (tradeId == 0) {
             return;
         }
+
         MerchantOffer offer = offerList.get(tradeId > offerList.size() ? offerList.size() - 1 : tradeId - 1);
         ItemStack firstItemStack = offer.getCostA();
         ItemStack secondItemStack = offer.getCostB();
         ItemStack firstDepleteItem = firstItemStack.copy();
         ItemStack secondDepleteItem = secondItemStack.copy();
-
         BlockEntity blockEntity = level.getBlockEntity(blockPos);
+
         if (!(blockEntity instanceof DispenserBlockEntity)) {
             return;
         }
+
         //#if MC > 12001
         //$$ BlockSource blockPointer = new BlockSource(level, blockPos, blockState, (DispenserBlockEntity) blockEntity);
         //#else
@@ -134,11 +154,13 @@ public class MixinDispenserBlock {
         //#endif
         DispenserBlockEntity dispenserBlockEntity = (DispenserBlockEntity) blockEntity;
         boolean success = false;
+
         while (!offer.isOutOfStock()) {
             ItemStack firstInventoryItemStack = pca$getItemFromInventory(firstItemStack, dispenserBlockEntity);
             ItemStack secondInventoryItemStack = pca$getItemFromInventory(secondItemStack, dispenserBlockEntity);
             int firstItemCount = firstInventoryItemStack.getCount();
             int secondItemCount = secondInventoryItemStack.getCount();
+
             if (offer.take(firstInventoryItemStack, secondInventoryItemStack)) {
                 firstDepleteItem.setCount(firstItemCount - firstInventoryItemStack.getCount());
                 secondDepleteItem.setCount(secondItemCount - secondInventoryItemStack.getCount());
@@ -156,6 +178,7 @@ public class MixinDispenserBlock {
             } else {
                 break;
             }
+
             if (!tradeAll) {
                 break;
             }
@@ -165,5 +188,4 @@ public class MixinDispenserBlock {
             ci.cancel();
         }
     }
-
 }

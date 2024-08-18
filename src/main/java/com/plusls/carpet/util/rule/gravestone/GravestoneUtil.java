@@ -55,8 +55,7 @@ public class GravestoneUtil {
 
     public static void deathHandle(@NotNull ServerPlayer player) {
         PlayerCompat playerCompat = PlayerCompat.of(player);
-        LevelCompat levelCompat = playerCompat.getLevel();
-        Level level = levelCompat.get();
+        Level level = playerCompat.getLevel();
 
         if (PluslsCarpetAdditionSettings.gravestone && !level.getGameRules().getBoolean(GameRules.RULE_KEEPINVENTORY)) {
             for (InteractionHand hand : InteractionHand.values()) {
@@ -139,7 +138,7 @@ public class GravestoneUtil {
         // search up
         gravePos.set(playerPos);
 
-        while (playerCompat.getLevel().get().getBlockState(gravePos).getBlock() == Blocks.BEDROCK) {
+        while (playerCompat.getLevel().getBlockState(gravePos).getBlock() == Blocks.BEDROCK) {
             gravePos.setY(gravePos.getY() + 1);
         }
 
@@ -150,9 +149,9 @@ public class GravestoneUtil {
     public static int clampY(@NotNull ServerPlayer player, int y) {
         //don't spawn on nether ceiling, unless the player is already there.
         PlayerCompat playerCompat = PlayerCompat.of(player);
-        LevelCompat levelCompat = playerCompat.getLevel();
+        LevelCompat levelCompat = PlayerCompat.of(player).getLevelCompat();
 
-        if (DimensionWrapper.of(levelCompat.get()).equals(DimensionWrapper.NETHER) &&
+        if (DimensionWrapper.of(playerCompat.getLevel()).equals(DimensionWrapper.NETHER) &&
                 y < NETHER_BEDROCK_MAX_Y) {
             //clamp to 1 -- don't spawn graves the layer right above the void, so players can actually recover their items.
             return Mth.clamp(y, levelCompat.getMinBuildHeight() + 1, NETHER_BEDROCK_MAX_Y - 1);
@@ -162,7 +161,7 @@ public class GravestoneUtil {
     }
 
     public static boolean canPlaceGrave(@NotNull ServerPlayer player, BlockPos pos) {
-        LevelCompat levelCompat = PlayerCompat.of(player).getLevel();
+        LevelCompat levelCompat = PlayerCompat.of(player).getLevelCompat();
         BlockState state = levelCompat.get().getBlockState(pos);
 
         if (pos.getY() <= levelCompat.getMinBuildHeight() + 1 ||
@@ -179,7 +178,7 @@ public class GravestoneUtil {
     // players are blown up
     // reduce y pos
     public static BlockPos drop(@NotNull ServerPlayer player, BlockPos pos) {
-        LevelCompat levelCompat = PlayerCompat.of(player).getLevel();
+        LevelCompat levelCompat = PlayerCompat.of(player).getLevelCompat();
         BlockPos.MutableBlockPos searchPos = new BlockPos.MutableBlockPos().set(pos);
         int i = 0;
 

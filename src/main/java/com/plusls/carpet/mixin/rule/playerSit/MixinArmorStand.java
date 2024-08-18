@@ -11,13 +11,16 @@ import org.jetbrains.annotations.NotNull;
 import org.spongepowered.asm.mixin.Intrinsic;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import top.hendrixshen.magiclib.compat.minecraft.api.nbt.TagCompatApi;
+import top.hendrixshen.magiclib.api.compat.minecraft.nbt.TagCompat;
+import top.hendrixshen.magiclib.api.compat.minecraft.world.entity.EntityCompat;
 
 @Mixin(ArmorStand.class)
 public abstract class MixinArmorStand extends LivingEntity implements SitEntity {
+    @Unique
     private boolean pca$sitEntity = false;
 
     protected MixinArmorStand(EntityType<? extends LivingEntity> entityType, Level world) {
@@ -29,7 +32,7 @@ public abstract class MixinArmorStand extends LivingEntity implements SitEntity 
 
     @Override
     public boolean pca$isSitEntity() {
-        return pca$sitEntity;
+        return this.pca$sitEntity;
     }
 
     @Override
@@ -48,23 +51,19 @@ public abstract class MixinArmorStand extends LivingEntity implements SitEntity 
     @SuppressWarnings({"MixinAnnotationTarget", "UnresolvedMixinReference", "target"})
     @Inject(
             method = "removePassenger(Lnet/minecraft/world/entity/Entity;)V",
-            at = @At(
-                    value = "HEAD"
-            )
-
+            at = @At("HEAD")
     )
     private void preRemovePassenger(Entity passenger, CallbackInfo ci) {
         if (this.pca$isSitEntity()) {
-            this.setPos(this.getX(), this.getY() + 0.16, this.getZ());
+            EntityCompat entityCompat = EntityCompat.of(this);
+            this.setPos(entityCompat.getX(), entityCompat.getY() + 0.16, entityCompat.getZ());
             this.kill();
         }
     }
 
     @Inject(
             method = "addAdditionalSaveData",
-            at = @At(
-                    value = "RETURN"
-            )
+            at = @At("RETURN")
     )
     private void postAddAdditionalSaveData(CompoundTag nbt, CallbackInfo ci) {
         if (this.pca$sitEntity) {
@@ -74,12 +73,10 @@ public abstract class MixinArmorStand extends LivingEntity implements SitEntity 
 
     @Inject(
             method = "readAdditionalSaveData",
-            at = @At(
-                    value = "RETURN"
-            )
+            at = @At("RETURN")
     )
     private void postReadAdditionalSaveData(@NotNull CompoundTag nbt, CallbackInfo ci) {
-        if (nbt.contains("SitEntity", TagCompatApi.TAG_BYTE)) {
+        if (nbt.contains("SitEntity", TagCompat.TAG_BYTE)) {
             this.pca$sitEntity = nbt.getBoolean("SitEntity");
         }
     }

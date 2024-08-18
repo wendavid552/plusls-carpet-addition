@@ -17,6 +17,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import top.hendrixshen.magiclib.api.compat.minecraft.world.entity.EntityCompat;
 
 @Mixin(AbstractVillager.class)
 public abstract class MixinAbstractVillager extends AgableMob implements ContainerListener {
@@ -30,9 +31,10 @@ public abstract class MixinAbstractVillager extends AgableMob implements Contain
 
     @Inject(method = "<init>", at = @At(value = "RETURN"))
     private void addInventoryListener(EntityType<? extends AbstractVillager> entityType, Level world, CallbackInfo info) {
-        if (this.getLevelCompat().isClientSide()) {
+        if (EntityCompat.of(this).getLevel().isClientSide()) {
             return;
         }
+
         this.inventory.addListener(this);
     }
 
@@ -44,9 +46,7 @@ public abstract class MixinAbstractVillager extends AgableMob implements Contain
     @SuppressWarnings({"MixinAnnotationTarget", "UnresolvedMixinReference", "target"})
     @Inject(
             method = {"containerChanged(Lnet/minecraft/world/Container;)V", "method_5453"},
-            at = @At(
-                    value = "HEAD"
-            ),
+            at = @At("HEAD"),
             remap = false
     )
     public void postContainerChanged(Container inventory, CallbackInfo ci) {

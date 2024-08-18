@@ -20,6 +20,11 @@ repositories {
     mavenLocal()
 
     maven {
+        name("NyanMaven Mirror")
+        url("https://maven.hendrixshen.top/mirror")
+    }
+
+    maven {
         name("Curse Maven")
         url("https://www.cursemaven.com")
 
@@ -35,16 +40,6 @@ repositories {
         content {
             includeGroup("maven.modrinth")
         }
-    }
-
-    maven {
-        name("Masa Maven")
-        url("https://masa.dy.fi/maven")
-    }
-
-    maven {
-        name("JitPack")
-        url("https://www.jitpack.io")
     }
 
     mavenCentral()
